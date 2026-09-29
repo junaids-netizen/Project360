@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 1686554250">
+<path id="Rectangle 2628468" fill-rule="evenodd" clip-rule="evenodd" d="M35.028 70C53.5703 70 68.7476 55.6041 69.9759 37.3878L54.8441 37.3797C45.1919 37.3595 37.3835 45.1617 37.4037 54.8061L37.4123 58.8636C35.9525 58.9976 34.4829 58.9971 33.0237 58.862L33.0151 54.796C32.9949 45.1515 25.1537 37.3166 15.5016 37.2964L11.6071 37.2883C11.4837 35.829 11.495 34.3603 11.6409 32.9023L15.4907 32.9104C25.1428 32.9306 32.9512 25.1285 32.931 15.484L32.9229 11.6293C34.3823 11.4828 35.8525 11.471 37.3132 11.5939L37.3214 15.4942C37.3416 25.1386 45.1828 32.9735 54.835 32.9938L70 33.0018C68.9635 14.6016 53.7023 0 35.028 0C15.6826 0 0 15.67 0 35C0 54.33 15.6826 70 35.028 70Z" fill="url(#paint0_linear_0_276)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_276" x1="57.4165" y1="65.5054" x2="-7.66092" y2="0.122474" gradientUnits="userSpaceOnUse">
+<stop stop-color="#291063"/>
+<stop offset="0.490385" stop-color="#7B54D3"/>
+<stop offset="1" stop-color="#BDB0DC"/>
+</linearGradient>
+</defs>
+</svg>

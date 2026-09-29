@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="receipt-bill, purchase, invoice">
+<path id="vector" d="M10.2083 9.04167H17.7917M10.2083 13.7083H13.125M5.54167 3.20833H22.4583V24.5L19.4444 22.1667L16.7222 24.7917L14 22.1667L11.2778 24.7917L8.55556 22.1667L5.54167 24.5V3.20833Z" stroke="url(#paint0_linear_0_892)" stroke-width="1.75" stroke-linecap="square"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_892" x1="13.5501" y1="3.20833" x2="12.7516" y2="32.5964" gradientUnits="userSpaceOnUse">
+<stop stop-color="#291063"/>
+<stop offset="0.615509" stop-color="#7B54D3"/>
+<stop offset="1" stop-color="#BDB0DC"/>
+</linearGradient>
+</defs>
+</svg>

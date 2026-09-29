@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="dollar, currency, money, coin, USD">
+<path id="vector" d="M14 8.60417V7.40509M14 19.3958V20.5949M16.5966 10.4028C16.0783 9.68597 15.1096 9.2037 14 9.2037H13.6669C12.1953 9.2037 11.0023 10.1581 11.0023 11.3354V11.4269C11.0023 12.269 11.597 13.0388 12.5385 13.4154L15.4615 14.5846C16.403 14.9612 16.9977 15.731 16.9977 16.5731C16.9977 17.8009 15.7535 18.7963 14.2187 18.7963H14C12.8904 18.7963 11.9217 18.314 11.4034 17.5972M24.7917 14C24.7917 19.9601 19.9601 24.7917 14 24.7917C8.03993 24.7917 3.20833 19.9601 3.20833 14C3.20833 8.03993 8.03993 3.20833 14 3.20833C19.9601 3.20833 24.7917 8.03993 24.7917 14Z" stroke="url(#paint0_linear_0_872)" stroke-width="1.75" stroke-linecap="square"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_872" x1="13.426" y1="3.20833" x2="12.7999" y2="32.6047" gradientUnits="userSpaceOnUse">
+<stop stop-color="#291063"/>
+<stop offset="0.615509" stop-color="#7B54D3"/>
+<stop offset="1" stop-color="#BDB0DC"/>
+</linearGradient>
+</defs>
+</svg>

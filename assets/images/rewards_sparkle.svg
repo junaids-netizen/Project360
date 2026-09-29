@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Rectangle 2628468" fill-rule="evenodd" clip-rule="evenodd" d="M20.016 40C30.6116 40 39.2844 31.7738 39.9862 21.3645L31.3395 21.3598C25.824 21.3483 21.362 25.8067 21.3736 31.3178L21.3784 33.6364C20.5443 33.7129 19.7045 33.7126 18.8707 33.6354L18.8658 31.312C18.8542 25.8009 14.3736 21.3238 8.85805 21.3122L6.63265 21.3076C6.5621 20.4737 6.56855 19.6345 6.65195 18.8013L8.85181 18.8059C14.3673 18.8175 18.8292 14.3591 18.8177 8.84801L18.8131 6.64529C19.647 6.56162 20.4871 6.55487 21.3218 6.62509L21.3265 8.85383C21.3381 14.3649 25.8188 18.842 31.3343 18.8536L40 18.8582C39.4077 8.34378 30.687 0 20.016 0C8.96148 0 0 8.9543 0 20C0 31.0457 8.96147 40 20.016 40Z" fill="url(#paint0_linear_0_863)"/>
+<defs>
+<linearGradient id="paint0_linear_0_863" x1="32.8095" y1="37.4317" x2="-4.37767" y2="0.0699852" gradientUnits="userSpaceOnUse">
+<stop stop-color="#291063"/>
+<stop offset="0.490385" stop-color="#7B54D3"/>
+<stop offset="1" stop-color="#BDB0DC"/>
+</linearGradient>
+</defs>
+</svg>
