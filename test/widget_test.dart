@@ -8,6 +8,8 @@ void main() {
       Project360App(controller: BrandController()),
     );
     await tester.pumpAndSettle();
-    expect(find.textContaining('Brand:'), findsOneWidget);
+    expect(find.text('Project360'), findsOneWidget);
+    expect(find.text('Brand'), findsOneWidget);
+    expect(find.text('Brand studio'), findsOneWidget);
   });
 }

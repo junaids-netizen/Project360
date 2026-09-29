@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_typography.dart';
-import 'package:project360/features/brand/brand_gallery_screen.dart';
+import 'package:project360/features/index/index_screen.dart';
 
 class Project360App extends StatelessWidget {
   const Project360App({super.key, required this.controller});
@@ -36,7 +36,7 @@ class Project360App extends StatelessWidget {
           onSurface: colors.textPrimary,
         ),
       ),
-      home: const BrandGalleryScreen(),
+      home: const IndexScreen(),
     );
   }
 }

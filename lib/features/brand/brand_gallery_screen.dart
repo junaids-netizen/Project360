@@ -29,7 +29,8 @@ class BrandGalleryScreen extends StatelessWidget {
           children: [
             VeraToolbar(
               title: 'Brand: ${brand.name}',
-              showBack: false,
+              showBack: Navigator.of(context).canPop(),
+              onBack: () => Navigator.of(context).pop(),
               onInfo: () => showBrandPicker(context),
             ),
             Expanded(

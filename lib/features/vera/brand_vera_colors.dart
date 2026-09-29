@@ -1,0 +1,22 @@
+import 'package:project360/app/theme/brand_colors.dart';
+import 'package:vera_design/app/theme/vera_colors.dart';
+
+/// Maps Project360's resolved [BrandColors] into vera_design's [VeraColors].
+VeraColors veraColorsFromBrand(BrandColors brand) {
+  return VeraColors(
+    accent: brand.accent,
+    accentSecondary: brand.accentSecondary,
+    cardSurface: brand.cardSurface,
+    navActive: brand.navActive,
+    textPrimary: brand.textPrimary,
+    surfaceMuted: brand.surfaceMuted,
+    borderMuted: brand.borderMuted,
+    letterbox: brand.letterbox,
+    frostTint: brand.frostTint,
+    sliderThumb: brand.sliderThumb,
+    darkGradient: brand.darkGradient,
+    buttonGradient: brand.buttonGradient,
+    progressGradient: brand.progressGradient,
+    pointsGlow: brand.pointsGlow,
+  );
+}
