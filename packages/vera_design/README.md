@@ -19,8 +19,10 @@ Example on Junaid’s Mac:
 ./tool/vendor_vera_design.sh ~/Desktop/Cursor/vera_design
 ```
 
-The script copies sources and assets into this directory, turns on the real Vera
-UI in previews, and runs `flutter pub get`.
+The script copies sources and assets into this directory, hoists
+`cupertino_native` to `packages/cupertino_native` (so it matches Project360’s
+glass-tab dependency), turns on the real Vera UI in previews, and runs
+`flutter pub get`.
 
 ## Commit the vendored tree
 
