@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_metrics.dart';
 import 'package:project360/app/theme/vera_typography.dart';
@@ -8,92 +7,62 @@ import 'package:project360/core/mock_data.dart';
 import 'package:project360/core/widgets/vera_assets.dart';
 import 'package:project360/core/widgets/vera_card.dart';
 import 'package:project360/core/widgets/vera_primitives.dart';
+import 'package:project360/features/home/bank_format.dart';
+import 'package:project360/features/home/bank_shell.dart';
 
-/// Card home: balances, the card, pay, and recent transactions.
-///
-/// The toolbar lives entirely in the safe area. The account name is not drawn
-/// into the status bar, and Back is plain text — no underline.
+/// Home as it ships: card on top, balance sitting on the card, payment due,
+/// rewards, and transactions. Nothing is drawn into the status bar.
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.onOpenRewards});
+
+  final VoidCallback? onOpenRewards;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.brand;
-    final bottom = MediaQuery.paddingOf(context).bottom;
+    final bottom = MediaQuery.paddingOf(context).bottom + bankTabClearance;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarContrastEnforced: false,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: colors.background,
-        body: SafeArea(
-          bottom: false,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(
-                  VeraSpacing.page,
-                  VeraSpacing.s4,
-                  VeraSpacing.page,
-                  bottom + VeraSpacing.s24,
-                ),
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
-                children: const [
-                  _HomeToolbar(),
-                  SizedBox(height: VeraSpacing.s12),
-                  _BalanceHeader(),
-                  SizedBox(height: VeraSpacing.s20),
-                  VeraCardFace(height: 160, showCvv: true),
-                  SizedBox(height: VeraSpacing.s16),
-                  _PayButton(),
-                  SizedBox(height: VeraSpacing.s12),
-                  _Transactions(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeToolbar extends StatelessWidget {
-  const _HomeToolbar();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.brand;
-    final backStyle = context.type.h4.copyWith(
-      fontWeight: FontWeight.w600,
-      decoration: TextDecoration.none,
-    );
-
-    return SizedBox(
-      height: 44,
+    return SafeArea(
+      bottom: false,
       child: Align(
-        alignment: Alignment.centerLeft,
-        child: GestureDetector(
-          key: const Key('home-back'),
-          behavior: HitTestBehavior.opaque,
-          onTap: Haptics.wrap(() => Navigator.of(context).maybePop()),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(
+              VeraSpacing.page,
+              VeraSpacing.s8,
+              VeraSpacing.page,
+              bottom,
+            ),
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             children: [
-              VeraSvg(VeraAssets.back, size: 24, color: colors.textPrimary),
-              const SizedBox(width: VeraSpacing.s4),
-              Text('Back', style: backStyle),
+              const Align(
+                alignment: Alignment.centerRight,
+                child: _InboxButton(),
+              ),
+              const SizedBox(height: VeraSpacing.s12),
+              const _CardAndBalance(),
+              const SizedBox(height: VeraSpacing.s8),
+              BankSectionHeader(
+                title: 'Payment due',
+                suffix: 'by ${MockData.paymentDueDate}',
+              ),
+              const _MinDueCard(),
+              const SizedBox(height: VeraSpacing.s8),
+              BankSectionHeader(
+                title: 'Rewards',
+                showChevron: true,
+                onTap: onOpenRewards,
+              ),
+              const _RewardsSummary(),
+              const SizedBox(height: VeraSpacing.s8),
+              const BankSectionHeader(
+                title: 'Transactions',
+                showChevron: true,
+              ),
+              const _TransactionList(),
             ],
           ),
         ),
@@ -102,125 +71,273 @@ class _HomeToolbar extends StatelessWidget {
   }
 }
 
-class _BalanceHeader extends StatelessWidget {
-  const _BalanceHeader();
+class _InboxButton extends StatelessWidget {
+  const _InboxButton();
 
   @override
   Widget build(BuildContext context) {
     final colors = context.brand;
-    final current = _splitMoney(MockData.currentBalance);
-    final available = _splitMoney(MockData.availableCredit);
+    return SizedBox(
+      width: 44,
+      height: 44,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: colors.cardShadow,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: VeraSvg(
+                VeraAssets.inbox,
+                size: 22,
+                color: colors.textPrimary,
+              ),
+            ),
+          ),
+          Positioned(
+            right: -2,
+            top: -2,
+            child: Container(
+              width: 18,
+              height: 18,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: colors.badge,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                '${MockData.inboxCount}',
+                style: TextStyle(
+                  fontFamily: VeraTypography.geist,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  height: 1,
+                  color: colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardAndBalance extends StatelessWidget {
+  const _CardAndBalance();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 92),
+          child: VeraCardFace(
+            height: 156,
+            revealed: false,
+            showCvv: true,
+            showSettings: false,
+          ),
+        ),
+        Positioned(
+          left: 12,
+          right: 12,
+          bottom: 0,
+          child: _BalanceCard(),
+        ),
+      ],
+    );
+  }
+}
+
+class _BalanceCard extends StatelessWidget {
+  const _BalanceCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.brand;
+    final current = groupedInt(MockData.currentBalance.round());
+    final available = groupedInt(MockData.availableCredit.round());
     final wholeStyle = TextStyle(
       fontFamily: VeraTypography.denton,
       fontWeight: FontWeight.w700,
       fontSize: 40,
       height: 1,
     );
-    final dollarStyle = TextStyle(
-      fontFamily: VeraTypography.denton,
-      fontWeight: FontWeight.w700,
-      fontSize: 30,
-      height: 1,
-    );
-    final wholeWidth = _textWidth(current.whole, wholeStyle);
-    final dollarWidth = _textWidth('\$', dollarStyle);
+    final barWidth = _textWidth(current, wholeStyle);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: FittedBox(
-                alignment: Alignment.centerLeft,
-                fit: BoxFit.scaleDown,
-                child: VeraSplitAmount(
-                  whole: current.whole,
-                  cents: current.cents,
-                  large: true,
+    return VeraCapsule(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      VeraSplitAmount(
+                        whole: current,
+                        cents: '',
+                        large: true,
+                        showCents: false,
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: barWidth,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          gradient: LinearGradient(
+                            colors: colors.progressGradient,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: VeraSpacing.s8),
+              VeraSplitAmount(
+                whole: available,
+                cents: '',
+                large: false,
+                showCents: false,
+              ),
+            ],
+          ),
+          const SizedBox(height: VeraSpacing.s8),
+          Row(
+            children: [
+              Expanded(
+                child: Text('Current Balance', style: context.type.p1),
+              ),
+              Text('Available Credit', style: context.type.p1),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MinDueCard extends StatelessWidget {
+  const _MinDueCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final due = groupedInt(MockData.minDue.round());
+    return VeraCapsule(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: FittedBox(
+              alignment: Alignment.centerLeft,
+              fit: BoxFit.scaleDown,
+              child: Row(
+                children: [
+                  VeraSplitAmount(
+                    whole: due,
+                    cents: '',
+                    large: true,
+                    showCents: false,
+                  ),
+                  const SizedBox(width: VeraSpacing.s8),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text('Min Due', style: context.type.p1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: VeraSpacing.s12),
+          VeraPrimaryButton(
+            label: 'Pay now',
+            width: 112,
+            height: 40,
+            onTap: Haptics.wrap(() {}),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RewardsSummary extends StatelessWidget {
+  const _RewardsSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.brand;
+    final points = groupedInt(MockData.rewardsPoints);
+    final number = TextStyle(
+      fontFamily: VeraTypography.geist,
+      fontWeight: FontWeight.w600,
+      fontSize: 28,
+      height: 1.1,
+      letterSpacing: -0.56,
+      color: colors.darkGradient[1],
+    );
+
+    return VeraCapsule(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Row(
+        children: [
+          const VeraSvg(VeraAssets.rewardsSparkle, size: 40),
+          const SizedBox(width: VeraSpacing.s12),
+          Expanded(
+            child: FittedBox(
+              alignment: Alignment.centerLeft,
+              fit: BoxFit.scaleDown,
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: points, style: number),
+                    TextSpan(
+                      text: ' points',
+                      style: number.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: colors.darkGradient.last,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(width: VeraSpacing.s8),
-            FittedBox(
-              alignment: Alignment.centerRight,
-              fit: BoxFit.scaleDown,
-              child: VeraSplitAmount(
-                whole: available.whole,
-                cents: available.cents,
-                large: false,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: VeraSpacing.s8),
-        Container(
-          margin: EdgeInsets.only(left: dollarWidth + 2),
-          width: wholeWidth,
-          height: 4,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(2),
-            gradient: LinearGradient(colors: colors.progressGradient),
           ),
-        ),
-        const SizedBox(height: VeraSpacing.s8),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Current Balance',
-                style: context.type.p1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Text(
-              'Available Credit',
-              style: context.type.p1,
-              textAlign: TextAlign.right,
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _PayButton extends StatelessWidget {
-  const _PayButton();
+class _TransactionList extends StatelessWidget {
+  const _TransactionList();
 
   @override
   Widget build(BuildContext context) {
-    return VeraPrimaryButton(
-      label: 'Pay now',
-      width: double.infinity,
-      height: 40,
-      onTap: Haptics.wrap(() {}),
-    );
-  }
-}
-
-class _Transactions extends StatelessWidget {
-  const _Transactions();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: VeraSpacing.s12),
-          child: Text('Transactions', style: context.type.h3),
-        ),
-        VeraCapsule(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Column(
-            children: [
-              for (final txn in MockData.homeTransactions) _TxnRow(txn: txn),
-            ],
-          ),
-        ),
-      ],
+    return VeraCapsule(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Column(
+        children: [
+          for (final txn in MockData.homeTransactions) _TxnRow(txn: txn),
+        ],
+      ),
     );
   }
 }
@@ -258,7 +375,7 @@ class _TxnRow extends StatelessWidget {
           ),
           if (amount != null)
             Text(
-              _signedMoney(amount, credit: credit),
+              signedMoney(amount, credit: credit),
               style: context.type.h4.copyWith(
                 color: credit ? colors.success : colors.textPrimary,
               ),
@@ -276,31 +393,6 @@ String _txnIcon(TxnKind kind) => switch (kind) {
   TxnKind.earn => VeraAssets.rewardsEarned,
   TxnKind.redeem => VeraAssets.rewardsRedeemed,
 };
-
-class _MoneyParts {
-  const _MoneyParts(this.whole, this.cents);
-
-  final String whole;
-  final String cents;
-}
-
-_MoneyParts _splitMoney(double value) {
-  final fixed = value.abs().toStringAsFixed(2);
-  final dot = fixed.indexOf('.');
-  final digits = fixed.substring(0, dot);
-  final cents = fixed.substring(dot);
-  final buf = StringBuffer();
-  for (var i = 0; i < digits.length; i++) {
-    if (i > 0 && (digits.length - i) % 3 == 0) buf.write(',');
-    buf.write(digits[i]);
-  }
-  return _MoneyParts(buf.toString(), cents);
-}
-
-String _signedMoney(double amount, {required bool credit}) {
-  final parts = _splitMoney(amount);
-  return '${credit ? '+' : '-'}\$${parts.whole}${parts.cents}';
-}
 
 double _textWidth(String text, TextStyle style) {
   final painter = TextPainter(
