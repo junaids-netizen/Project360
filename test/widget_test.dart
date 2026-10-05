@@ -11,5 +11,6 @@ void main() {
     expect(find.text('Project360'), findsOneWidget);
     expect(find.text('Brand'), findsOneWidget);
     expect(find.text('Brand studio'), findsOneWidget);
+    expect(find.text('Component library'), findsOneWidget);
   });
 }

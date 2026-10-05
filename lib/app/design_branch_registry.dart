@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project360/features/brand/brand_gallery_screen.dart';
+import 'package:project360/features/design_system/design_system_screen.dart';
 import 'package:project360/features/vera/vera_prototype_host.dart';
 
 /// Registered demos for the index launcher (first screen on launch).
@@ -24,10 +25,17 @@ class DesignSection {
 
 const List<DesignSection> designSections = [
   DesignSection(
+    title: 'Design system',
     branches: [
       DesignBranch(
+        label: 'Component library',
+        description:
+            'Tokens, atoms, molecules, organisms — live previews under the active brand',
+        builder: _designSystem,
+      ),
+      DesignBranch(
         label: 'Brand studio',
-        description: 'Tokens, card face, and primitives under the active brand',
+        description: 'Full token ramp + primitives (quick brand regression check)',
         builder: _brandGallery,
       ),
     ],
@@ -43,6 +51,8 @@ const List<DesignSection> designSections = [
     ],
   ),
 ];
+
+Widget _designSystem(BuildContext context) => const DesignSystemScreen();
 
 Widget _brandGallery(BuildContext context) => const BrandGalleryScreen();
 
