@@ -7,6 +7,7 @@ import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_metrics.dart';
 import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
+import 'package:project360/core/widgets/bank_logo.dart';
 import 'package:project360/features/brand/brand_picker_sheet.dart';
 
 const double _kIndexCardRadius = 26;
@@ -121,10 +122,16 @@ class _BrandRow extends StatelessWidget {
             Container(
               width: 24,
               height: 24,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: brand.seed,
                 shape: BoxShape.circle,
                 border: Border.all(color: colors.border, width: 1.25),
+              ),
+              child: BankLogo(
+                brand: brand,
+                size: 14,
+                color: colors.onColor(brand.seed),
               ),
             ),
             const SizedBox(width: VeraSpacing.s4),
