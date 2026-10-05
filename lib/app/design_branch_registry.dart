@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project360/features/brand/brand_gallery_screen.dart';
-import 'package:project360/features/vera/vera_prototype_host.dart';
+import 'package:project360/features/home/bank_shell.dart';
 
 /// Registered demos for the index launcher (first screen on launch).
 class DesignBranch {
@@ -37,8 +37,8 @@ const List<DesignSection> designSections = [
     branches: [
       DesignBranch(
         label: 'Vera app',
-        description: 'Full tabbed experience — home, rewards, card, and account',
-        builder: _veraCards,
+        description: 'Home, rewards, card, and account',
+        builder: _home,
       ),
     ],
   ),
@@ -46,4 +46,4 @@ const List<DesignSection> designSections = [
 
 Widget _brandGallery(BuildContext context) => const BrandGalleryScreen();
 
-Widget _veraCards(BuildContext context) => const VeraCardPrototypeHost();
+Widget _home(BuildContext context) => const BankApp();
