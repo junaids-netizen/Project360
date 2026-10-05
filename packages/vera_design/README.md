@@ -9,7 +9,7 @@ From the Project360 root:
 
 ```bash
 ./tool/vendor_vera_design.sh /path/to/vera_design
-./tool/vendor_glass_tab.sh /path/to/vera_app
+./tool/vendor_glass_tab.sh /path/to/vera_design
 flutter run -d "iPhone 17"
 ```
 
