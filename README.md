@@ -18,6 +18,8 @@ previews, vendor a copy into this repo once:
 
 ```bash
 ./tool/vendor_vera_design.sh /path/to/vera_design
+# or from Git:
+./tool/vendor_vera_design.sh https://github.com/rishi-zeta/VeraDesign.git
 ```
 
 Then commit `packages/vera_design/` so the team never needs the Vera repo

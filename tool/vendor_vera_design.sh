@@ -9,8 +9,20 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="${1:-}"
 
 if [[ -z "$SRC" ]]; then
-  echo "Usage: $0 /path/to/vera_design" >&2
+  echo "Usage: $0 /path/to/vera_design | git-url" >&2
+  echo "Example: $0 https://github.com/rishi-zeta/VeraDesign.git" >&2
   exit 1
+fi
+
+if [[ "$SRC" =~ ^(https://|git@|ssh://) ]]; then
+  CACHE="$ROOT/.vendor-cache/vera_design"
+  echo "Cloning Vera Design from $SRC -> $CACHE"
+  rm -rf "$CACHE"
+  if ! git clone --depth 1 "$SRC" "$CACHE"; then
+    echo "Clone failed. For private repos: gh auth login, or use an SSH URL." >&2
+    exit 1
+  fi
+  SRC="$CACHE"
 fi
 
 if [[ ! -f "$SRC/pubspec.yaml" ]]; then

@@ -19,11 +19,20 @@ If `flutter pub get` fails with two different `cupertino_native` paths, run:
 ./tool/hoist_cupertino_native.sh
 ```
 
-Example on Junaid’s Mac:
+Local folder on Junaid’s Mac:
 
 ```bash
 ./tool/vendor_vera_design.sh ~/Desktop/Cursor/vera_design
 ```
+
+From Git (when you do not keep a local copy):
+
+```bash
+./tool/vendor_vera_design.sh https://github.com/rishi-zeta/VeraDesign.git
+```
+
+If clone fails with “Repository not found”, run `gh auth login` or use SSH —
+the repo may be private.
 
 The script copies sources and assets into this directory, hoists
 `cupertino_native` to `packages/cupertino_native` (so it matches Project360’s
