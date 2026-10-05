@@ -143,11 +143,20 @@ class _VeraCardFaceState extends State<VeraCardFace>
                 top: -30,
                 child: Opacity(
                   opacity: 0.10,
-                  child: Image.asset(
-                    VeraAssets.cardPattern,
+                  child: Container(
                     width: 204,
                     height: 204,
-                    fit: BoxFit.cover,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          colors.onColor(colors.cardSurface),
+                          colors
+                              .onColor(colors.cardSurface)
+                              .withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -251,11 +260,7 @@ class _CardDetails extends StatelessWidget {
                   color: context.brand.cardDivider,
                 ),
                 const SizedBox(width: 11),
-                const VeraSvg(
-                  VeraAssets.mastercard,
-                  width: 32,
-                  height: 26,
-                ),
+                const VeraSvg(VeraAssets.mastercard, width: 32, height: 26),
                 const Spacer(),
                 GestureDetector(
                   onTap: onSettings,
@@ -375,13 +380,7 @@ class _FrostBloom extends StatelessWidget {
         child: Transform.scale(
           scale: 1.14 - 0.14 * progress,
           alignment: const Alignment(0.8, -0.9),
-          child: Image.asset(
-            VeraAssets.frostTexture,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-            alignment: const Alignment(0.15, -0.2),
-          ),
+          child: SizedBox.expand(child: ColoredBox(color: context.brand.white)),
         ),
       ),
     );
@@ -573,9 +572,7 @@ class _SplitAmount extends StatelessWidget {
       amount = shade(amount);
       dollarMark = Opacity(
         opacity: 0.5,
-        child: shade(
-          Text('\$', style: dollar.copyWith(color: colors.white)),
-        ),
+        child: shade(Text('\$', style: dollar.copyWith(color: colors.white))),
       );
     }
 

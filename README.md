@@ -6,6 +6,8 @@ Forked from the white-label branding system in [Vera Design](https://github.com/
 
 ## Run
 
+This checkout is self-contained. `flutter pub get` and `flutter run` do not need a sibling Vera Design folder.
+
 ```bash
 flutter pub get
 flutter run

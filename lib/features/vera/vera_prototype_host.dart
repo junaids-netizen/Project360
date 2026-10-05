@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:project360/app/theme/brand_theme.dart';
-import 'package:project360/features/vera/brand_vera_colors.dart';
-import 'package:vera_design/app/app.dart';
-import 'package:vera_design/app/router.dart';
-import 'package:vera_design/app/theme/vera_colors_scope.dart';
+import 'package:project360/features/bank/bank_preview_app.dart';
+import 'package:project360/features/pitch/configured_vera_router.dart';
+import 'package:project360/features/pitch/pitch_modules.dart';
+import 'package:project360/features/pitch/preview_back.dart';
 
-/// Embeds the full Vera tabbed app with the active Project360 brand palette.
+/// Home, rewards, card, and account — the full tabbed bank, in this repo.
+const List<PitchModule> veraAppModules = [
+  PitchModule.home,
+  PitchModule.rewards,
+  PitchModule.card,
+  PitchModule.settings,
+];
+
+/// Embeds the tabbed bank app with the active Project360 brand palette.
 class VeraCardPrototypeHost extends StatefulWidget {
   const VeraCardPrototypeHost({super.key});
 
@@ -15,21 +22,19 @@ class VeraCardPrototypeHost extends StatefulWidget {
 }
 
 class _VeraCardPrototypeHostState extends State<VeraCardPrototypeHost> {
-  GoRouter? _router;
+  late final GoRouter _router = createPitchRouter(veraAppModules);
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _router ??= createVeraFullAppRouter();
+  void dispose() {
+    _router.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final brandColors = context.brand;
-
-    return VeraColorsScope(
-      colors: veraColorsFromBrand(brandColors),
-      child: VeraDesignApp(router: _router!),
+    return PreviewBack(
+      onBack: () => Navigator.of(context).pop(),
+      child: BankPreviewApp(router: _router),
     );
   }
 }

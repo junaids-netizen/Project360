@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project360/features/brand/brand_gallery_screen.dart';
 import 'package:project360/features/design_system/design_system_screen.dart';
+import 'package:project360/features/pitch/pitch_builder_screen.dart';
+import 'package:project360/features/pitch/pitch_preview_host.dart';
 import 'package:project360/features/vera/vera_prototype_host.dart';
 
 /// Registered demos for the index launcher (first screen on launch).
@@ -25,17 +27,27 @@ class DesignSection {
 
 const List<DesignSection> designSections = [
   DesignSection(
+    title: 'Pitch',
+    branches: [
+      DesignBranch(
+        label: 'Build an app',
+        description: "Choose modules, then preview the bank's app.",
+        builder: _pitchBuilder,
+      ),
+    ],
+  ),
+  DesignSection(
     title: 'Design system',
     branches: [
       DesignBranch(
         label: 'Component library',
-        description:
-            'Tokens, atoms, molecules, organisms — live previews under the active brand',
+        description: 'Tokens, atoms, molecules, organisms — live previews under the active brand',
         builder: _designSystem,
       ),
       DesignBranch(
         label: 'Brand studio',
-        description: 'Full token ramp + primitives (quick brand regression check)',
+        description:
+            'Full token ramp + primitives (quick brand regression check)',
         builder: _brandGallery,
       ),
     ],
@@ -45,12 +57,16 @@ const List<DesignSection> designSections = [
     branches: [
       DesignBranch(
         label: 'Vera app',
-        description: 'Full tabbed experience — home, rewards, card, and account',
+        description:
+            'Full tabbed experience — home, rewards, card, and account',
         builder: _veraCards,
       ),
     ],
   ),
 ];
+
+Widget _pitchBuilder(BuildContext context) =>
+    PitchBuilderScreen(onPreview: openPitchPreview);
 
 Widget _designSystem(BuildContext context) => const DesignSystemScreen();
 
