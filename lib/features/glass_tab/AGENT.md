@@ -26,10 +26,18 @@ Or vendor only the handoff (if Vera Design is already copied):
 
 That script copies:
 
-- `glass_tab_shell.dart` → `lib/features/glass_tab/glass_tab_shell.dart`
-- `dart/` → `lib/features/glass_tab/` (availability, haptics, bounce)
+- `handoff/glass-tab/dart/` → `lib/features/glass_tab/dart/` (availability, haptics, bounce)
+- Vera reference `glass_tab_shell.dart` → `lib/features/glass_tab/handoff/` (not pitch shell)
+- **Pitch** keeps `lib/features/glass_tab/glass_tab_shell.dart` (`navigationShell` + dynamic tabs)
 - `ios/` → `ios/Runner/GlassTabHandoff/` (wire AppDelegate per handoff AGENT.md)
 - `packages/cupertino_native/` → `packages/cupertino_native/` (unless already hoisted)
+
+If a build fails with missing `dart/bounce_tap.dart` or wrong `GlassTabShell` parameters, run:
+
+```bash
+./tool/restore_glass_tab_shell.sh
+./tool/vendor_glass_tab.sh ~/Desktop/Cursor/vera_design
+```
 
 ## Bootstrap (required)
 

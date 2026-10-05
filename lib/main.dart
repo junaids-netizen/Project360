@@ -6,8 +6,8 @@ import 'package:project360/features/glass_tab/native_glass_availability.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final nativeGlass = await NativeGlassAvailability.initialize();
-  CupertinoNative.useNativeViews = nativeGlass;
+  await NativeGlassAvailability.initialize();
+  CupertinoNative.useNativeViews = NativeGlassAvailability.isAvailable;
   final brand = await BrandController.restore();
   runApp(Project360App(controller: BrandController(brand)));
 }
