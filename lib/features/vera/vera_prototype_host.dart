@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:project360/features/bank/bank_preview_app.dart';
-import 'package:project360/features/pitch/configured_vera_router.dart';
-import 'package:project360/features/pitch/pitch_modules.dart';
+import 'package:project360/features/embed/preview_app.dart';
 import 'package:project360/features/pitch/preview_back.dart';
+import 'package:project360/features/vera/full_vera_router.dart';
 
-/// Home, rewards, card, and account — the full tabbed bank, in this repo.
-const List<PitchModule> veraAppModules = [
-  PitchModule.home,
-  PitchModule.rewards,
-  PitchModule.card,
-  PitchModule.settings,
-];
-
-/// Embeds the tabbed bank app with the active Project360 brand palette.
+/// Embeds the tabbed bank or Vera app with the active Project360 brand palette.
 class VeraCardPrototypeHost extends StatefulWidget {
   const VeraCardPrototypeHost({super.key});
 
@@ -22,7 +13,7 @@ class VeraCardPrototypeHost extends StatefulWidget {
 }
 
 class _VeraCardPrototypeHostState extends State<VeraCardPrototypeHost> {
-  late final GoRouter _router = createPitchRouter(veraAppModules);
+  late final GoRouter _router = createFullVeraRouter();
 
   @override
   void dispose() {
@@ -34,7 +25,7 @@ class _VeraCardPrototypeHostState extends State<VeraCardPrototypeHost> {
   Widget build(BuildContext context) {
     return PreviewBack(
       onBack: () => Navigator.of(context).pop(),
-      child: BankPreviewApp(router: _router),
+      child: buildPreviewApp(router: _router),
     );
   }
 }

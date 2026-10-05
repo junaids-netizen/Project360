@@ -1,0 +1,190 @@
+import 'package:flutter/widgets.dart';
+import 'package:project360/app/theme/brand_theme.dart';
+import 'package:project360/features/pitch/pitch_modules.dart';
+import 'package:vera_design/features/home/home_screen.dart';
+
+/// Modules selected for this pitch. Sits above Vera home.
+class PitchModulesScope extends InheritedWidget {
+  const PitchModulesScope({
+    super.key,
+    required this.modules,
+    required super.child,
+  });
+
+  final Set<PitchModule> modules;
+
+  static PitchModulesScope? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<PitchModulesScope>();
+  }
+
+  bool includes(PitchModule module) =>
+      module == PitchModule.home || modules.contains(module);
+
+  @override
+  bool updateShouldNotify(PitchModulesScope oldWidget) =>
+      oldWidget.modules.length != modules.length ||
+      !oldWidget.modules.containsAll(modules);
+}
+
+/// Vera [HomeScreen] with shortcuts for switched-off modules covered.
+class GatedHome extends StatelessWidget {
+  const GatedHome({super.key, required this.modules});
+
+  final Set<PitchModule> modules;
+
+  @override
+  Widget build(BuildContext context) {
+    return PitchModulesScope(
+      modules: modules,
+      child: _FilteredHome(modules: modules),
+    );
+  }
+}
+
+class _FilteredHome extends StatelessWidget {
+  const _FilteredHome({required this.modules});
+
+  final Set<PitchModule> modules;
+
+  @override
+  Widget build(BuildContext context) {
+    return _HomeShortcutHider(
+      hiddenLabels: hiddenHomeShortcutLabels(modules),
+      child: const HomeScreen(),
+    );
+  }
+}
+
+class _HomeShortcutHider extends StatefulWidget {
+  const _HomeShortcutHider({required this.hiddenLabels, required this.child});
+
+  final Set<String> hiddenLabels;
+  final Widget child;
+
+  @override
+  State<_HomeShortcutHider> createState() => _HomeShortcutHiderState();
+}
+
+class _HomeShortcutHiderState extends State<_HomeShortcutHider> {
+  final _overlayKey = GlobalKey<_ShortcutOverlayState>();
+  var _disposed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.hiddenLabels.isNotEmpty) _schedule();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _schedule() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_disposed || !mounted) return;
+      _sync();
+      _schedule();
+    });
+  }
+
+  void _sync() {
+    final overlay = _overlayKey.currentState;
+    final stackBox = context.findRenderObject();
+    if (overlay == null || stackBox is! RenderBox || !stackBox.hasSize) return;
+    final rects = <Rect>[];
+    void visit(Element element) {
+      final built = element.widget;
+      if (built is Text) {
+        final data = built.data ?? built.textSpan?.toPlainText();
+        if (data != null && widget.hiddenLabels.contains(data.trim())) {
+          final rect = _rowRect(element, stackBox);
+          if (rect != null) rects.add(rect);
+        }
+      }
+      element.visitChildren(visit);
+    }
+
+    context.visitChildElements(visit);
+    overlay.rects = rects;
+  }
+
+  Rect? _rowRect(Element label, RenderBox ancestor) {
+    RenderBox? target;
+    label.visitAncestorElements((ancestorElement) {
+      if (ancestorElement.widget is _HomeShortcutHider) return false;
+      final object = ancestorElement.renderObject;
+      if (object is RenderBox &&
+          object.hasSize &&
+          object.attached &&
+          object.size.height >= 32 &&
+          object.size.height <= 180 &&
+          object.size.width > 100) {
+        target = object;
+        return false;
+      }
+      return true;
+    });
+    final box = target;
+    if (box == null) return null;
+    try {
+      final origin = box.localToGlobal(Offset.zero, ancestor: ancestor);
+      return origin & box.size;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        widget.child,
+        Positioned.fill(child: _ShortcutOverlay(key: _overlayKey)),
+      ],
+    );
+  }
+}
+
+class _ShortcutOverlay extends StatefulWidget {
+  const _ShortcutOverlay({super.key});
+
+  @override
+  State<_ShortcutOverlay> createState() => _ShortcutOverlayState();
+}
+
+class _ShortcutOverlayState extends State<_ShortcutOverlay> {
+  List<Rect> _rects = const [];
+
+  set rects(List<Rect> value) {
+    if (_same(_rects, value)) return;
+    setState(() => _rects = value);
+  }
+
+  bool _same(List<Rect> a, List<Rect> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        for (final rect in _rects)
+          Positioned(
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+            child: AbsorbPointer(
+              child: ColoredBox(color: context.brand.background),
+            ),
+          ),
+      ],
+    );
+  }
+}

@@ -5,20 +5,25 @@ import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
 import 'package:project360/core/widgets/vera_assets.dart';
-import 'package:project360/features/bank/bank_flows.dart';
-import 'package:project360/features/bank/inbox_screen.dart';
-import 'package:project360/features/bank/manage_card_screen.dart';
-import 'package:project360/features/bank/rewards_screen.dart';
-import 'package:project360/features/bank/settings_screen.dart';
-import 'package:project360/features/pitch/home_module_gate.dart';
+import 'package:vera_design/features/card/card_activate_cvc_screen.dart';
+import 'package:vera_design/features/card/card_ready_screen.dart';
+import 'package:vera_design/features/card/card_received_prompt_screen.dart';
+import 'package:vera_design/features/card/manage_card_screen.dart';
+import 'package:vera_design/features/card/replace_card_screen.dart';
+import 'package:vera_design/features/home/add_authorized_user_screen.dart';
+import 'package:vera_design/features/inbox/inbox_screen.dart';
+import 'package:vera_design/features/pay/pay_screen.dart';
+import 'package:vera_design/features/rewards/rewards_screen.dart';
+import 'package:vera_design/features/settings/settings_screen.dart';
+import 'package:project360/features/pitch/home_module_gate_vera.dart';
 import 'package:project360/features/pitch/pitch_modules.dart';
 import 'package:project360/features/pitch/preview_back.dart';
 
-/// Tabbed bank shell whose branches are only [modules], in pitch order.
+/// Vera Design screens in the pitch shell whose branches are only [modules], in pitch order.
 ///
 /// Subflows that belong to an included module (card activation, pay, inbox)
 /// stay reachable. Paths for a module that was switched off redirect home.
-GoRouter createPitchRouter(List<PitchModule> modules) {
+GoRouter createPitchRouterVeraImpl(List<PitchModule> modules) {
   final enabled = modules.toSet();
   final rootKey = GlobalKey<NavigatorState>();
 
@@ -84,7 +89,7 @@ GoRouter createPitchRouter(List<PitchModule> modules) {
           path: '/card/replace',
           parentNavigatorKey: rootKey,
           pageBuilder: (context, state) =>
-              const CupertinoPage(child: ReplaceCardScreen()),
+              CupertinoPage(child: ReplaceCardScreen()),
         ),
         GoRoute(
           path: '/card/received',
