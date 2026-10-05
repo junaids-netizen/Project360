@@ -1,0 +1,4 @@
+import 'package:go_router/go_router.dart';
+import 'package:vera_design/app/router.dart';
+
+GoRouter createFullVeraRouterImpl() => createVeraFullAppRouter();

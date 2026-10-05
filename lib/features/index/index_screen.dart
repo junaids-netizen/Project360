@@ -11,16 +11,13 @@ import 'package:project360/features/brand/brand_picker_sheet.dart';
 
 const double _kIndexCardRadius = 26;
 
-const Color _surface = Color(0xFFF2F2F2);
-const Color _textSecondary = Color(0xFF8E8E93);
-const Color _textTertiary = Color(0xFFC7C7CC);
-
 /// First screen on cold start. Lists registered demos; tap pushes the prototype.
 class IndexScreen extends StatelessWidget {
   const IndexScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.brand;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -34,7 +31,7 @@ class IndexScreen extends StatelessWidget {
       child: Scaffold(
         extendBody: true,
         extendBodyBehindAppBar: true,
-        backgroundColor: _surface,
+        backgroundColor: colors.background,
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics(),
@@ -46,7 +43,7 @@ class IndexScreen extends StatelessWidget {
               sliver: SliverToBoxAdapter(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.white,
                     borderRadius: BorderRadius.circular(_kIndexCardRadius),
                   ),
                   clipBehavior: Clip.antiAlias,
@@ -61,13 +58,13 @@ class IndexScreen extends StatelessWidget {
                   sliver: SliverToBoxAdapter(
                     child: Text(
                       section.title!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: VeraTypography.geist,
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.4,
                         height: 1.2,
-                        color: Colors.black,
+                        color: colors.textPrimary,
                       ),
                     ),
                   ),
@@ -160,10 +157,11 @@ class _IndexCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.brand;
     return RepaintBoundary(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.white,
           borderRadius: BorderRadius.circular(_kIndexCardRadius),
         ),
         clipBehavior: Clip.antiAlias,
@@ -173,11 +171,11 @@ class _IndexCard extends StatelessWidget {
             for (var i = 0; i < branches.length; i++) ...[
               _IndexRow(branch: branches[i]),
               if (i < branches.length - 1)
-                const Divider(
+                Divider(
                   height: 0.5,
                   thickness: 0.5,
                   indent: 16,
-                  color: _textTertiary,
+                  color: colors.border,
                 ),
             ],
           ],
@@ -194,6 +192,7 @@ class _IndexRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.brand;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -215,26 +214,26 @@ class _IndexRow extends StatelessWidget {
                 children: [
                   Text(
                     branch.label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: VeraTypography.geist,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       letterSpacing: -0.1,
                       height: 1.35,
-                      color: Colors.black,
+                      color: colors.textPrimary,
                     ),
                   ),
                   if (branch.description != null) ...[
                     const SizedBox(height: 3),
                     Text(
                       branch.description!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: VeraTypography.geist,
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         letterSpacing: -0.06,
                         height: 1.3,
-                        color: _textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ],
@@ -244,7 +243,7 @@ class _IndexRow extends StatelessWidget {
             Icon(
               Icons.chevron_right_rounded,
               size: 20,
-              color: _textSecondary.withValues(alpha: 0.6),
+              color: colors.textSecondary.withValues(alpha: 0.6),
             ),
           ],
         ),
@@ -292,6 +291,7 @@ class _IndexHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
+    final colors = context.brand;
     final progress = (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
     final fontSize = lerpDouble(28, 17, progress) ?? 17;
 
@@ -316,7 +316,7 @@ class _IndexHeaderDelegate extends SliverPersistentHeaderDelegate {
                   fontWeight: FontWeight.w600,
                   letterSpacing: fontSize > 20 ? -0.56 : -0.22,
                   height: 1.1,
-                  color: Colors.black,
+                  color: colors.textPrimary,
                 ),
               ),
             ),
@@ -324,9 +324,9 @@ class _IndexHeaderDelegate extends SliverPersistentHeaderDelegate {
         );
 
         final overlay = BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.62),
+          color: colors.white.withValues(alpha: 0.62),
           border: Border(
-            bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
+            bottom: BorderSide(color: colors.textPrimary.withValues(alpha: 0.06)),
           ),
         );
 

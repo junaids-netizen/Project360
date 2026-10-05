@@ -4,8 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 abstract final class VeraAssets {
   static const String logo = 'assets/images/logo.svg';
   static const String mastercard = 'assets/images/mastercard.svg';
-  static const String cardPattern = 'assets/images/card_pattern.png';
-  static const String frostTexture = 'assets/images/frost_texture.jpg';
   static const String frozenBadge = 'assets/images/icon_frozen_badge.svg';
   static const String copy = 'assets/images/icon_copy.svg';
   static const String settings = 'assets/images/icon_settings.svg';

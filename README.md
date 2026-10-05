@@ -6,10 +6,24 @@ Forked from the white-label branding system in [Vera Design](https://github.com/
 
 ## Run
 
+This checkout is self-contained: no sibling `../vera_design` folder.
+
 ```bash
 flutter pub get
 flutter run
 ```
+
+To use the **real Vera Design UI** (same screens as the Vera product) inside
+previews, vendor a copy into this repo once:
+
+```bash
+./tool/vendor_vera_design.sh /path/to/vera_design
+# or from Git:
+./tool/vendor_vera_design.sh https://github.com/rishi-zeta/VeraDesign.git
+```
+
+Then commit `packages/vera_design/` so the team never needs the Vera repo
+checkout again. See [packages/vera_design/README.md](packages/vera_design/README.md).
 
 Tap **info** in the toolbar to open the brand picker (presets + custom hue/intensity).
 

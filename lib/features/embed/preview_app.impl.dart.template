@@ -1,0 +1,18 @@
+import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
+import 'package:project360/app/theme/brand_theme.dart';
+import 'package:project360/features/vera/brand_vera_colors.dart';
+import 'package:vera_design/app/app.dart';
+import 'package:vera_design/app/theme/vera_colors_scope.dart';
+
+/// Vendored Vera Design app shell with Project360 brand colours.
+Widget buildPreviewAppImpl({required GoRouter router}) {
+  return Builder(
+    builder: (context) {
+      return VeraColorsScope(
+        colors: veraColorsFromBrand(context.brand),
+        child: VeraDesignApp(router: router),
+      );
+    },
+  );
+}

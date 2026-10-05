@@ -1,7 +1,7 @@
 import 'package:project360/app/theme/brand_colors.dart';
 import 'package:vera_design/app/theme/vera_colors.dart';
 
-/// Maps Project360's resolved [BrandColors] into vera_design's [VeraColors].
+/// Maps Project360 [BrandColors] into Vera Design [VeraColors].
 VeraColors veraColorsFromBrand(BrandColors brand) {
   return VeraColors(
     accent: brand.accent,
