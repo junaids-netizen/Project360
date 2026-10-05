@@ -1,14 +1,13 @@
 import 'package:cupertino_native/cupertino_native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
 import 'package:project360/features/glass_tab/glass_tab_item.dart';
-import 'package:project360/features/glass_tab/native_glass_availability.dart';
 
-/// Tab shell with native Liquid Glass on iOS 26+ (when vendored) and a gray
-/// capsule fallback elsewhere. Matches Vera's glass-tab handoff contract.
+/// Pitch / preview tab shell: native Liquid Glass [CNTabBar] on iOS, gray capsule elsewhere.
 class GlassTabShell extends StatefulWidget {
   const GlassTabShell({
     super.key,
@@ -28,6 +27,11 @@ class GlassTabShell extends StatefulWidget {
 class _GlassTabShellState extends State<GlassTabShell> {
   double _contentOpacity = 1;
 
+  bool get _useNativeGlass =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
+
   void _selectTab(int index) {
     final shell = widget.navigationShell;
     final reselect = index == shell.currentIndex;
@@ -45,14 +49,13 @@ class _GlassTabShellState extends State<GlassTabShell> {
   Widget build(BuildContext context) {
     final colors = context.brand;
     final bottom = MediaQuery.paddingOf(context).bottom;
-    final useNative =
-        CupertinoNative.useNativeViews && NativeGlassAvailability.isAvailable;
 
     return Scaffold(
       backgroundColor: colors.background,
       extendBody: true,
       resizeToAvoidBottomInset: false,
       body: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
           AnimatedOpacity(
             opacity: _contentOpacity,
@@ -60,47 +63,30 @@ class _GlassTabShellState extends State<GlassTabShell> {
             curve: Curves.easeOut,
             child: widget.navigationShell,
           ),
-          if (useNative)
-            _NativeTabOverlay(
-              tabs: widget.tabs,
-              selectedIndex: widget.navigationShell.currentIndex,
-              onSelect: _selectTab,
-            )
-          else
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: bottom + 8,
-              child: _FallbackCapsuleBar(
-                tabs: widget.tabs,
-                selectedIndex: widget.navigationShell.currentIndex,
-                onSelect: _selectTab,
-              ),
-            ),
+          Padding(
+            padding: EdgeInsets.only(bottom: bottom + 8, left: 16, right: 16),
+            child: _useNativeGlass
+                ? CNTabBar(
+                    items: [
+                      for (final tab in widget.tabs)
+                        CNTabBarItem(
+                          label: tab.label,
+                          icon: CNSymbol(tab.sfSymbol),
+                        ),
+                    ],
+                    currentIndex: widget.navigationShell.currentIndex,
+                    onTap: _selectTab,
+                    tint: colors.navActive,
+                    shrinkCentered: true,
+                  )
+                : _FallbackCapsuleBar(
+                    tabs: widget.tabs,
+                    selectedIndex: widget.navigationShell.currentIndex,
+                    onSelect: _selectTab,
+                  ),
+          ),
         ],
       ),
-    );
-  }
-}
-
-/// Placeholder until Vera's native overlay is vendored.
-class _NativeTabOverlay extends StatelessWidget {
-  const _NativeTabOverlay({
-    required this.tabs,
-    required this.selectedIndex,
-    required this.onSelect,
-  });
-
-  final List<GlassTabItem> tabs;
-  final int selectedIndex;
-  final ValueChanged<int> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return _FallbackCapsuleBar(
-      tabs: tabs,
-      selectedIndex: selectedIndex,
-      onSelect: onSelect,
     );
   }
 }
