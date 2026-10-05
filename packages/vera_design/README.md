@@ -13,6 +13,12 @@ From the Project360 root:
 flutter run -d "iPhone 17"
 ```
 
+If `flutter pub get` fails with two different `cupertino_native` paths, run:
+
+```bash
+./tool/hoist_cupertino_native.sh
+```
+
 Example on Junaid’s Mac:
 
 ```bash
