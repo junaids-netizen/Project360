@@ -300,7 +300,7 @@ class _CardDetails extends StatelessWidget {
               ),
               if (showCvv) ...[
                 _SecretValue(
-                  masked: '•••',
+                  masked: '• • •',
                   value: MockData.cardCvv,
                   revealed: secretsRevealed,
                   style: panStyle,
@@ -308,7 +308,7 @@ class _CardDetails extends StatelessWidget {
                 const SizedBox(width: 16),
               ],
               _SecretValue(
-                masked: '••/••',
+                masked: '• • / • •',
                 value: MockData.cardExpiry,
                 revealed: secretsRevealed,
                 style: panStyle,
@@ -448,7 +448,7 @@ class VeraBalanceBar extends StatelessWidget {
                 child: FittedBox(
                   alignment: Alignment.centerLeft,
                   fit: BoxFit.scaleDown,
-                  child: _SplitAmount(
+                  child: VeraSplitAmount(
                     whole: '4,500',
                     cents: '.88',
                     large: true,
@@ -459,7 +459,7 @@ class VeraBalanceBar extends StatelessWidget {
               FittedBox(
                 alignment: Alignment.centerRight,
                 fit: BoxFit.scaleDown,
-                child: _SplitAmount(
+                child: VeraSplitAmount(
                   whole: '15,550',
                   cents: '.88',
                   large: false,
@@ -517,8 +517,9 @@ class VeraBalanceBar extends StatelessWidget {
   }
 }
 
-class _SplitAmount extends StatelessWidget {
-  const _SplitAmount({
+class VeraSplitAmount extends StatelessWidget {
+  const VeraSplitAmount({
+    super.key,
     required this.whole,
     required this.cents,
     required this.large,
