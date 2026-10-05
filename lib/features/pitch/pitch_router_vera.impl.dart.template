@@ -2,9 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:project360/app/theme/brand_theme.dart';
-import 'package:project360/core/haptics.dart';
-import 'package:project360/core/widgets/vera_assets.dart';
-import 'package:vera_design/shells/tab_shell.dart';
 import 'package:vera_design/features/card/card_activate_cvc_screen.dart';
 import 'package:vera_design/features/card/card_ready_screen.dart';
 import 'package:vera_design/features/card/card_received_prompt_screen.dart';
@@ -15,9 +12,11 @@ import 'package:vera_design/features/inbox/inbox_screen.dart';
 import 'package:vera_design/features/pay/pay_screen.dart';
 import 'package:vera_design/features/rewards/rewards_screen.dart';
 import 'package:vera_design/features/settings/settings_screen.dart';
+import 'package:project360/features/glass_tab/glass_tab_shell.dart';
+import 'package:project360/features/glass_tab/pitch_glass_tabs.dart';
 import 'package:project360/features/pitch/home_module_gate_vera.dart';
 import 'package:project360/features/pitch/pitch_modules.dart';
-import 'package:project360/features/pitch/preview_back.dart';
+import 'package:project360/features/pitch/pitch_preview_chrome.dart';
 
 /// Vera Design screens in the pitch shell whose branches are only [modules], in pitch order.
 ///
@@ -47,8 +46,11 @@ GoRouter createPitchRouterVeraImpl(List<PitchModule> modules) {
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          return _PitchPreviewChrome(
-            child: TabShell(navigationShell: navigationShell),
+          return PitchPreviewChrome(
+            child: GlassTabShell(
+              navigationShell: navigationShell,
+              tabs: glassTabsForPitchModules(modules),
+            ),
           );
         },
         branches: [
@@ -111,51 +113,6 @@ GoRouter createPitchRouterVeraImpl(List<PitchModule> modules) {
       ],
     ],
   );
-}
-
-/// Back control over the Vera shell (does not replace TabShell).
-class _PitchPreviewChrome extends StatelessWidget {
-  const _PitchPreviewChrome({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final back = PreviewBack.maybeOf(context);
-    if (back == null) return child;
-
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        child,
-        SafeArea(
-          bottom: false,
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: GestureDetector(
-              key: const Key('preview-back'),
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                Haptics.light();
-                back.onBack();
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const VeraSvg(VeraAssets.back, size: 24),
-                    const SizedBox(width: 8),
-                    Text('Back', style: context.type.h4),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class _MissingStep extends StatelessWidget {

@@ -101,3 +101,6 @@ rg "class TabShell" -A 12 "$DEST/lib/shells/tab_shell.dart" || true
 echo ""
 echo "Done. Real Vera screens are enabled (kVeraVendored = true)."
 echo "Commit packages/vera_design/ when you are ready to drop the external Vera repo."
+echo ""
+echo "For Liquid Glass pitch tabs on iOS 26+, also run (Vera *app* repo root):"
+echo "  ./tool/vendor_glass_tab.sh /path/to/vera_app"

@@ -1,0 +1,17 @@
+name: cupertino_native
+description: Native iOS Liquid Glass views (vendored from Vera). Stub until vendor_glass_tab.sh runs.
+publish_to: "none"
+version: 0.0.1
+
+environment:
+  sdk: ^3.13.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: CupertinoNativePlugin
