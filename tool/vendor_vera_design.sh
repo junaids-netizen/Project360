@@ -95,5 +95,9 @@ cd "$ROOT"
 flutter pub get
 
 echo ""
+echo "TabShell API (pitch preview uses this for glass tabs):"
+rg "class TabShell" -A 12 "$DEST/lib/shells/tab_shell.dart" || true
+
+echo ""
 echo "Done. Real Vera screens are enabled (kVeraVendored = true)."
 echo "Commit packages/vera_design/ when you are ready to drop the external Vera repo."
