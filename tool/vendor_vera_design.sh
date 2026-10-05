@@ -98,7 +98,7 @@ flutter pub get
 
 echo ""
 echo "TabShell API (pitch preview uses this for glass tabs):"
-rg "class TabShell" -A 12 "$DEST/lib/shells/tab_shell.dart" || true
+grep -A 12 "class TabShell" "$DEST/lib/shells/tab_shell.dart" 2>/dev/null || true
 
 echo ""
 echo "Done. Real Vera screens are enabled (kVeraVendored = true)."
