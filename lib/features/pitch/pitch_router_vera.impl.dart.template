@@ -1,6 +1,9 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:project360/app/theme/brand_colors.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
@@ -171,18 +174,8 @@ class PitchTabShell extends StatelessWidget {
                   left: 16,
                   right: 16,
                   bottom: bottom + 8,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colors.white,
-                      borderRadius: BorderRadius.circular(32),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors.navShadow,
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
+                  child: _GlassTabBar(
+                    colors: colors,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Row(
@@ -212,6 +205,41 @@ class PitchTabShell extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Frosted floating nav — matches Vera TabShell (blur + translucent fill).
+class _GlassTabBar extends StatelessWidget {
+  const _GlassTabBar({required this.colors, required this.child});
+
+  final BrandColors colors;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.white.withValues(alpha: 0.72),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: colors.white.withValues(alpha: 0.9),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: colors.navShadow,
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: child,
+        ),
       ),
     );
   }
