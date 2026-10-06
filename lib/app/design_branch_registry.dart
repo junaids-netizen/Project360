@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project360/features/brand/brand_gallery_screen.dart';
+import 'package:project360/features/builder/build_app_screen.dart';
 import 'package:project360/features/vera/vera_prototype_host.dart';
 
 /// Registered demos for the index launcher (first screen on launch).
@@ -26,6 +27,11 @@ const List<DesignSection> designSections = [
   DesignSection(
     branches: [
       DesignBranch(
+        label: 'Build an app',
+        description: 'Choose the bank and the modules they get, then preview',
+        builder: _buildApp,
+      ),
+      DesignBranch(
         label: 'Brand studio',
         description: 'Tokens, card face, and primitives under the active brand',
         builder: _brandGallery,
@@ -43,6 +49,8 @@ const List<DesignSection> designSections = [
     ],
   ),
 ];
+
+Widget _buildApp(BuildContext context) => const BuildAppScreen();
 
 Widget _brandGallery(BuildContext context) => const BrandGalleryScreen();
 
