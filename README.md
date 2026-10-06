@@ -29,7 +29,7 @@ flutter test
 
 ## Add a bank preset
 
-Edit `lib/app/theme/brand.dart` — add a `Brand` to `brandPresets` with `id`, `name`, and `seed` colour.
+Edit `lib/app/theme/brand.dart` — add a `Brand` to `brandPresets` with `id`, `name`, `seed` colour, and `logoAsset`. Drop a single-colour SVG in `assets/images/banks/`. The pitch builder lists that logo in the brand picker and writes the bank's name on the card.
 
 ## Repo
 

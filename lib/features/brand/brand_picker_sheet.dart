@@ -3,6 +3,7 @@ import 'package:project360/app/theme/brand.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_metrics.dart';
 import 'package:project360/core/haptics.dart';
+import 'package:project360/core/widgets/bank_logo.dart';
 import 'package:project360/core/widgets/vera_assets.dart';
 
 /// Opens the brand switcher.
@@ -62,11 +63,10 @@ class BrandPickerSheet extends StatelessWidget {
                 ],
               ),
             ),
-            for (final preset in brandPresets)
-              _BrandRow(
-                brand: preset,
-                selected: preset.id == active.id,
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+              child: _BankLogoChooser(active: active),
+            ),
             Divider(height: 17, thickness: 1, color: colors.border),
             _CustomBrand(active: active),
           ],
@@ -76,8 +76,45 @@ class BrandPickerSheet extends StatelessWidget {
   }
 }
 
-class _BrandRow extends StatelessWidget {
-  const _BrandRow({required this.brand, required this.selected});
+/// One row of bank logos. Tap a logo and that bank's name lands on the card.
+///
+/// Tiles share the row while they stay tappable. Past that they wrap, so
+/// adding another bank to [brandPresets] does not overflow the sheet.
+class _BankLogoChooser extends StatelessWidget {
+  const _BankLogoChooser({required this.active});
+
+  final Brand active;
+
+  static const double _minTile = 64;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final count = brandPresets.length;
+        final share = count == 0 ? _minTile : constraints.maxWidth / count;
+        final double tile = share >= _minTile ? share : _minTile;
+        return Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          runSpacing: 8,
+          children: [
+            for (final preset in brandPresets)
+              SizedBox(
+                width: tile,
+                child: _BankLogoChoice(
+                  brand: preset,
+                  selected: preset.id == active.id,
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _BankLogoChoice extends StatelessWidget {
+  const _BankLogoChoice({required this.brand, required this.selected});
 
   final Brand brand;
   final bool selected;
@@ -86,20 +123,45 @@ class _BrandRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.brand;
     return GestureDetector(
+      key: ValueKey('bank-logo-${brand.id}'),
       behavior: HitTestBehavior.opaque,
       onTap: Haptics.wrap(() => BrandScope.read(context).select(brand)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: VeraSpacing.s20,
-          vertical: 10,
-        ),
-        child: Row(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
           children: [
-            _Swatch(seed: brand.seed),
-            const SizedBox(width: 12),
-            Expanded(child: Text(brand.name, style: context.type.h4)),
-            if (selected)
-              VeraSvg(VeraAssets.checkCircle, size: 20, color: colors.accent),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: brand.seed,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selected ? colors.headerPrimary : colors.border,
+                  width: selected ? 2 : 1.25,
+                ),
+              ),
+              child: BankLogo(
+                brand: brand,
+                size: 22,
+                color: colors.onColor(brand.seed),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              brand.name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: context.type.p2.copyWith(
+                color: selected ? colors.textPrimary : colors.textSecondary,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                height: 1.15,
+              ),
+            ),
           ],
         ),
       ),

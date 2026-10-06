@@ -25,6 +25,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/images/banks/
+    - assets/images/modules/
     - ../vera_design/assets/images/
   fonts:
     - family: Geist

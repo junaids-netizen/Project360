@@ -4,6 +4,7 @@ import 'package:project360/app/theme/vera_metrics.dart';
 import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
 import 'package:project360/core/mock_data.dart';
+import 'package:project360/core/widgets/bank_logo.dart';
 import 'package:project360/core/widgets/vera_assets.dart';
 
 class VeraCardFace extends StatefulWidget {
@@ -15,6 +16,7 @@ class VeraCardFace extends StatefulWidget {
     this.showCvv = false,
     this.frozen = false,
     this.onSettings,
+    this.onChooseBank,
   });
 
   final double height;
@@ -23,6 +25,10 @@ class VeraCardFace extends StatefulWidget {
   final bool showCvv;
   final bool frozen;
   final VoidCallback? onSettings;
+
+  /// Tapping the bank name and logo. The pitch builder uses this to open the
+  /// logo picker without leaving the card.
+  final VoidCallback? onChooseBank;
 
   @override
   State<VeraCardFace> createState() => _VeraCardFaceState();
@@ -162,6 +168,7 @@ class _VeraCardFaceState extends State<VeraCardFace>
                     showBrand: widget.showBrand,
                     showCvv: widget.showCvv,
                     onSettings: widget.onSettings,
+                    onChooseBank: widget.onChooseBank,
                     panStyle: panStyle,
                   ),
                 ),
@@ -222,6 +229,7 @@ class _CardDetails extends StatelessWidget {
     required this.showBrand,
     required this.showCvv,
     required this.onSettings,
+    required this.onChooseBank,
     required this.panStyle,
   });
 
@@ -231,6 +239,7 @@ class _CardDetails extends StatelessWidget {
   final bool showBrand;
   final bool showCvv;
   final VoidCallback? onSettings;
+  final VoidCallback? onChooseBank;
   final TextStyle panStyle;
 
   @override
@@ -242,28 +251,51 @@ class _CardDetails extends StatelessWidget {
         children: [
           Row(
             children: [
-              const VeraSvg(VeraAssets.logo, width: 44, height: 16),
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: GestureDetector(
+                        onTap: onChooseBank == null
+                            ? null
+                            : Haptics.wrap(onChooseBank),
+                        behavior: HitTestBehavior.opaque,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: BankNameLockup(
+                            color: context.brand.onColor(
+                              context.brand.cardSurface,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (showBrand) ...[
+                      const SizedBox(width: 11),
+                      Container(
+                        width: 1,
+                        height: 29,
+                        color: context.brand.cardDivider,
+                      ),
+                      const SizedBox(width: 11),
+                      const VeraSvg(
+                        VeraAssets.mastercard,
+                        width: 32,
+                        height: 26,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
               if (showBrand) ...[
-                const SizedBox(width: 11),
-                Container(
-                  width: 1,
-                  height: 29,
-                  color: context.brand.cardDivider,
-                ),
-                const SizedBox(width: 11),
-                const VeraSvg(
-                  VeraAssets.mastercard,
-                  width: 32,
-                  height: 26,
-                ),
-                const Spacer(),
                 GestureDetector(
                   onTap: onSettings,
                   child: const VeraSvg(VeraAssets.settings, size: 16),
                 ),
                 const SizedBox(width: 16),
-              ] else
-                const Spacer(),
+              ],
               GestureDetector(
                 onTap: onToggleSecrets,
                 behavior: HitTestBehavior.opaque,

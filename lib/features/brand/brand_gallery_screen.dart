@@ -97,7 +97,10 @@ class BrandGalleryScreen extends StatelessWidget {
                     ),
                   ),
                   const _Heading('Primitives'),
-                  const VeraCardFace(showCvv: true),
+                  VeraCardFace(
+                    showCvv: true,
+                    onChooseBank: () => showBrandPicker(context),
+                  ),
                   const SizedBox(height: 12),
                   const VeraBalanceBar(),
                   const SizedBox(height: 12),
