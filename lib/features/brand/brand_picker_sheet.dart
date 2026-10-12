@@ -62,11 +62,10 @@ class BrandPickerSheet extends StatelessWidget {
                 ],
               ),
             ),
+            if (active.id == Brand.websiteId || active.id == pitchDemoBrand.id)
+              _BrandRow(brand: active, selected: true),
             for (final preset in brandPresets)
-              _BrandRow(
-                brand: preset,
-                selected: preset.id == active.id,
-              ),
+              _BrandRow(brand: preset, selected: preset.id == active.id),
             Divider(height: 17, thickness: 1, color: colors.border),
             _CustomBrand(active: active),
           ],
@@ -192,11 +191,7 @@ class _CustomBrandState extends State<_CustomBrand> {
               const SizedBox(width: 12),
               Expanded(child: Text('Custom', style: context.type.h4)),
               if (widget.active.id == Brand.customId)
-                VeraSvg(
-                  VeraAssets.checkCircle,
-                  size: 20,
-                  color: colors.accent,
-                ),
+                VeraSvg(VeraAssets.checkCircle, size: 20, color: colors.accent),
             ],
           ),
           const SizedBox(height: 12),
@@ -274,10 +269,7 @@ class _Strip extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: colors.white, width: 3),
                       boxShadow: [
-                        BoxShadow(
-                          color: colors.chromeShadow,
-                          blurRadius: 8,
-                        ),
+                        BoxShadow(color: colors.chromeShadow, blurRadius: 8),
                       ],
                     ),
                   ),

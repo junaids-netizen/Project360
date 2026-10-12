@@ -5,6 +5,12 @@ import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
 import 'package:project360/core/mock_data.dart';
 import 'package:project360/core/widgets/vera_assets.dart';
+import 'package:project360/features/pitch/brand_mark.dart';
+
+bool _hasSiteLogo(BuildContext context) {
+  final url = BrandScope.of(context).brand.logoUrl;
+  return url != null && url.isNotEmpty;
+}
 
 class VeraCardFace extends StatefulWidget {
   const VeraCardFace({
@@ -16,6 +22,7 @@ class VeraCardFace extends StatefulWidget {
     this.showSettings = true,
     this.banner,
     this.frozen = false,
+    this.logo,
     this.onSettings,
     this.onBanner,
   });
@@ -27,6 +34,11 @@ class VeraCardFace extends StatefulWidget {
   final bool showSettings;
   final String? banner;
   final bool frozen;
+
+  /// Replaces the wordmark. The pitch preview passes the logo read from a
+  /// bank site; null keeps [BrandMark], which uses the site logo when the
+  /// active brand has one and the Vera wordmark otherwise.
+  final Widget? logo;
   final VoidCallback? onSettings;
   final VoidCallback? onBanner;
 
@@ -169,6 +181,7 @@ class _VeraCardFaceState extends State<VeraCardFace>
                     showCvv: widget.showCvv,
                     showSettings: widget.showSettings,
                     banner: widget.banner,
+                    logo: widget.logo,
                     onSettings: widget.onSettings,
                     onBanner: widget.onBanner,
                     panStyle: panStyle,
@@ -232,6 +245,7 @@ class _CardDetails extends StatelessWidget {
     required this.showCvv,
     required this.showSettings,
     required this.banner,
+    required this.logo,
     required this.onSettings,
     required this.onBanner,
     required this.panStyle,
@@ -244,6 +258,7 @@ class _CardDetails extends StatelessWidget {
   final bool showCvv;
   final bool showSettings;
   final String? banner;
+  final Widget? logo;
   final VoidCallback? onSettings;
   final VoidCallback? onBanner;
   final TextStyle panStyle;
@@ -294,7 +309,12 @@ class _CardDetails extends StatelessWidget {
                   ),
                 )
               else ...[
-                const VeraSvg(VeraAssets.logo, width: 44, height: 16),
+                logo ??
+                    BrandMark(
+                      width: 44,
+                      height: _hasSiteLogo(context) ? 22 : 16,
+                      fallback: VeraAssets.logo,
+                    ),
                 if (showBrand) ...[
                   const SizedBox(width: 11),
                   Container(
@@ -303,11 +323,7 @@ class _CardDetails extends StatelessWidget {
                     color: context.brand.cardDivider,
                   ),
                   const SizedBox(width: 11),
-                  const VeraSvg(
-                    VeraAssets.mastercard,
-                    width: 32,
-                    height: 26,
-                  ),
+                  const VeraSvg(VeraAssets.mastercard, width: 32, height: 26),
                   const Spacer(),
                   if (showSettings) ...[
                     GestureDetector(
@@ -628,9 +644,7 @@ class VeraSplitAmount extends StatelessWidget {
       amount = shade(amount);
       dollarMark = Opacity(
         opacity: 0.5,
-        child: shade(
-          Text('\$', style: dollar.copyWith(color: colors.white)),
-        ),
+        child: shade(Text('\$', style: dollar.copyWith(color: colors.white))),
       );
     }
 

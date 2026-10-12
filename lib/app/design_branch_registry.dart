@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project360/features/brand/brand_gallery_screen.dart';
 import 'package:project360/features/home/bank_shell.dart';
+import 'package:project360/features/pitch/pitch_preview_screen.dart';
 import 'package:project360/features/three_sixty/capsule_app.dart';
 
 /// Registered demos for the index launcher (first screen on launch).
@@ -30,6 +31,16 @@ const List<DesignSection> designSections = [
         label: 'Brand studio',
         description: 'Tokens, card face, and primitives under the active brand',
         builder: _brandGallery,
+      ),
+    ],
+  ),
+  DesignSection(
+    title: 'Pitch',
+    branches: [
+      DesignBranch(
+        label: 'Pitch preview',
+        description: 'Colours and logo from a bank website',
+        builder: _pitchPreview,
       ),
     ],
   ),
@@ -67,11 +78,14 @@ const List<DesignSection> designSections = [
 
 Widget _brandGallery(BuildContext context) => const BrandGalleryScreen();
 
+Widget _pitchPreview(BuildContext context) => const PitchPreviewScreen();
+
 Widget _home(BuildContext context) => const BankApp();
 
 Widget _capsuleApp(BuildContext context) => const CapsuleApp();
 
-Widget _capsuleFamilyHub(BuildContext context) => const CapsuleApp(initialTab: 1);
+Widget _capsuleFamilyHub(BuildContext context) =>
+    const CapsuleApp(initialTab: 1);
 
 Widget _capsuleCreditHealth(BuildContext context) =>
     const CapsuleApp(initialTab: 2);
