@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/features/three_sixty/capsule_shell.dart';
 import 'package:project360/features/three_sixty/credit_health_screen.dart';
+import 'package:project360/features/three_sixty/family_hub_screen.dart';
 import 'package:project360/features/three_sixty/my_cards_screen.dart';
 
 /// Capsule / 360 shell with fixed bottom tabs (My Cards, Family Hub, Credit Health, Merlin).
@@ -43,7 +44,7 @@ class _CapsuleAppState extends State<CapsuleApp> {
               index: _index,
               children: const [
                 MyCardsScreen(),
-                CapsulePlaceholderScreen(title: 'Family Hub'),
+                FamilyHubScreen(),
                 CreditHealthScreen(),
                 CapsulePlaceholderScreen(title: 'Merlin'),
               ],

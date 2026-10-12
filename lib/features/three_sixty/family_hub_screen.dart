@@ -429,20 +429,34 @@ class _FamilyBalanceBar extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              '\$${groupedInt(used.round())}',
-              style: context.type.h1.copyWith(
-                fontSize: 28,
-                height: 36 / 28,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                '\$${groupedInt(used.round())}',
+                overflow: TextOverflow.ellipsis,
+                style: context.type.h1.copyWith(
+                  fontSize: 28,
+                  height: 36 / 28,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            const Spacer(),
-            _LegendDot(color: availableBar),
-            const SizedBox(width: 4),
-            Text(
-              '\$${groupedInt(available.round())} Available',
-              style: context.type.p2,
+            const SizedBox(width: 8),
+            Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  _LegendDot(color: availableBar),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      '\$${groupedInt(available.round())} Available',
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: context.type.p2,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -515,11 +529,13 @@ class _ProcessingPaymentStrip extends StatelessWidget {
               color: colors.textPrimary,
             ),
             const SizedBox(width: 7),
-            Text(
-              '\$${groupedInt(MockDataCapsule.familyPaymentAmount.round())} payment',
-              style: context.type.p2,
+            Expanded(
+              child: Text(
+                '\$${groupedInt(MockDataCapsule.familyPaymentAmount.round())} payment',
+                overflow: TextOverflow.ellipsis,
+                style: context.type.p2,
+              ),
             ),
-            const Spacer(),
             _TxnStatusBadge(
               label: 'PROCESSING',
               foreground: colors.warning,
@@ -607,21 +623,15 @@ class _FamilyTxnRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(txn.merchant, style: context.type.h4),
-                Row(
-                  children: [
-                    Text(txn.date, style: context.type.p2),
-                    Text(
-                      ' • ',
-                      style: context.type.p2.copyWith(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                        height: 12 / 10,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                    Text(txn.time, style: context.type.p2),
-                  ],
+                Text(
+                  txn.merchant,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.type.h4,
+                ),
+                Text(
+                  '${txn.date} • ${txn.time}',
+                  overflow: TextOverflow.ellipsis,
+                  style: context.type.p2,
                 ),
               ],
             ),

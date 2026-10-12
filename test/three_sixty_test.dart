@@ -40,7 +40,10 @@ void main() {
     expect(find.text('Due amount'), findsOneWidget);
   });
 
-  testWidgets('Family Hub tab shows placeholder until screen ships', (tester) async {
+  testWidgets('Family Hub tab shows member rail and balance', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     await tester.pumpWidget(
       MaterialApp(
         home: BrandScope(
@@ -52,6 +55,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Family Hub'), findsWidgets);
+    expect(find.text('ZACK'), findsOneWidget);
+    expect(find.text('Rachel'), findsOneWidget);
+    expect(find.text('Used'), findsOneWidget);
+    expect(find.text('Manage card'), findsOneWidget);
+    expect(find.text('PENDING'), findsOneWidget);
+    expect(find.text('DECLINED'), findsOneWidget);
   });
 
   testWidgets('Manage opens manage card screen', (tester) async {

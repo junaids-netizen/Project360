@@ -52,6 +52,11 @@ const List<DesignSection> designSections = [
         builder: _capsuleApp,
       ),
       DesignBranch(
+        label: 'Family Hub',
+        description: 'Family members, cards, and spending (Capsule tab 2)',
+        builder: _capsuleFamilyHub,
+      ),
+      DesignBranch(
         label: 'Credit Health',
         description: 'Score gauge and history (Capsule tab 3)',
         builder: _capsuleCreditHealth,
@@ -65,6 +70,8 @@ Widget _brandGallery(BuildContext context) => const BrandGalleryScreen();
 Widget _home(BuildContext context) => const BankApp();
 
 Widget _capsuleApp(BuildContext context) => const CapsuleApp();
+
+Widget _capsuleFamilyHub(BuildContext context) => const CapsuleApp(initialTab: 1);
 
 Widget _capsuleCreditHealth(BuildContext context) =>
     const CapsuleApp(initialTab: 2);

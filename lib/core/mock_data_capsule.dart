@@ -1,3 +1,5 @@
+import 'package:project360/core/widgets/three_sixty_assets.dart';
+
 enum CapsuleTxnStatus { pending, declined }
 
 class CapsuleTransaction {
@@ -46,21 +48,15 @@ abstract final class MockDataCapsule {
   static const double familyPaymentAmount = 100;
 
   static const List<CapsuleFamilyMember> familyMembers = [
-    CapsuleFamilyMember(
-      name: 'Zack',
-      avatarAsset: 'assets/images/360/avatar_zack.png',
-    ),
+    CapsuleFamilyMember(name: 'Zack', avatarAsset: ThreeSixtyAssets.avatarZack),
     CapsuleFamilyMember(
       name: 'Rachel',
-      avatarAsset: 'assets/images/360/avatar_rachel.png',
+      avatarAsset: ThreeSixtyAssets.avatarRachel,
     ),
-    CapsuleFamilyMember(
-      name: 'Mike',
-      avatarAsset: 'assets/images/360/avatar_mike.png',
-    ),
+    CapsuleFamilyMember(name: 'Mike', avatarAsset: ThreeSixtyAssets.avatarMike),
     CapsuleFamilyMember(
       name: 'Olivia',
-      avatarAsset: 'assets/images/360/avatar_olivia.png',
+      avatarAsset: ThreeSixtyAssets.avatarOlivia,
     ),
   ];
 

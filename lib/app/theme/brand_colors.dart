@@ -190,6 +190,8 @@ class BrandColors {
   final Color success = const Color(0xFF006328);
   final Color warning = const Color(0xFFE06C00);
   final Color danger = const Color(0xFFCC4B0E);
+  final Color info = const Color(0xFF3B82F6);
+  final Color paymentStripBorder = const Color(0xFFFFF4E8);
 
   /// Ink that stays legible on [surface]. Guards against banks whose brand
   /// colour is light enough that white text on it disappears.
