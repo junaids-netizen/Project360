@@ -23,11 +23,11 @@ class CapsuleHeader extends StatelessWidget {
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(26),
+              borderRadius: BorderRadius.circular(20),
               child: Image.asset(
                 ThreeSixtyAssets.avatar,
-                width: 36,
-                height: 36,
+                width: 40,
+                height: 40,
                 fit: BoxFit.cover,
               ),
             ),
@@ -56,7 +56,10 @@ class CapsuleHeader extends StatelessWidget {
                 ],
               ),
             ),
-            VeraSvg(VeraAssets.bell, size: 36, color: colors.textPrimary),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: VeraSvg(VeraAssets.bell, size: 24, color: colors.textPrimary),
+            ),
           ],
         ),
       ),

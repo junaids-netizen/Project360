@@ -101,15 +101,11 @@ class _CapsuleCardFace extends StatelessWidget {
                 color: colors.white,
               ),
               const Spacer(),
-              Text(
-                'VISA',
-                style: TextStyle(
-                  fontFamily: VeraTypography.geist,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  letterSpacing: 2,
-                  color: colors.white,
-                ),
+              VeraSvg(
+                ThreeSixtyAssets.visaWordmark,
+                width: 64,
+                height: 20,
+                color: colors.white,
               ),
             ],
           ),
