@@ -15,7 +15,9 @@ The script boots the simulator from Xcode first, then Flutter only attaches to t
 2. `xcrun simctl boot <udid>` boots it. An already-booted device (`current state: Booted`) is left alone.
 3. `open -a Simulator --args -CurrentDeviceUDID <udid>` opens Xcode's Simulator.app (not Flutter's emulator launcher).
 4. The script waits until `xcrun simctl list devices` shows that UDID as `Booted` (about 60 seconds).
-5. `flutter pub get`, then `flutter run -d <udid>` in tmux session `project360-iphone17`.
+5. `flutter pub get`, then `flutter run -d <udid>`.
+   - When `tmux` is on PATH, or at `/opt/homebrew/bin/tmux` or `/usr/local/bin/tmux`, the run stays in tmux session `project360-iphone17`.
+   - When tmux is missing, the script has already booted Simulator from Xcode. It prints `tmux was not found so Flutter is starting in this terminal.` and runs `flutter run -d <udid>` in the current terminal. A missing tmux does not stop Simulator.app from opening.
 
 It does not call `flutter emulators`, `flutter devices`, or Flutter Device Hub.
 
@@ -33,7 +35,7 @@ Defaults:
 |--------|---------|
 | Branch | `cursor/fix-home-screen-884e` |
 | Project dir | `~/Desktop/Cursor/Project360-360` (`PROJECT360_DIR`) |
-| tmux session | `project360-iphone17` |
+| tmux session | `project360-iphone17` when tmux is installed; otherwise Flutter runs in this terminal |
 | Simulator | `iPhone 17` (`IOS_SIM_NAME`) |
 
 Examples:
@@ -42,9 +44,11 @@ Examples:
 # Different worktree and simulator
 PROJECT360_DIR=~/Desktop/Cursor/Project360 IOS_SIM_NAME="iPhone 16" ./scripts/relaunch_ios_sim.sh main
 
-# Watch logs
+# Watch logs when tmux is installed
 tmux attach -t project360-iphone17
 ```
+
+Without tmux, the same script boots the simulator and leaves `flutter run` in the terminal you launched it from. Attach is only for the tmux path.
 
 Recommended worktree if your main checkout has local WIP that blocks `git pull`:
 

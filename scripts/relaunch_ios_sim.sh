@@ -15,6 +15,10 @@
 # not call `flutter emulators`, `flutter devices`, or Flutter Device Hub. Those
 # go through Flutter's device daemon, which tries to discover and boot the
 # simulator itself and can hang on sim loading.
+#
+# tmux is optional. When `tmux` is on PATH, or at /opt/homebrew/bin/tmux or
+# /usr/local/bin/tmux, Flutter stays in the tmux session. When it is missing,
+# Simulator.app still opens and `flutter run -d <udid>` runs in this terminal.
 
 set -euo pipefail
 
@@ -24,6 +28,7 @@ TMUX_SESSION="${PROJECT360_TMUX_SESSION:-project360-iphone17}"
 IOS_SIM_NAME="${IOS_SIM_NAME:-iPhone 17}"
 BOOT_TIMEOUT_SECS=60
 TMUX_CONF="${TMUX_CONF:-/exec-daemon/tmux.portal.conf}"
+TMUX_BIN=""
 
 xcode_setup_error() {
   echo "Simulator.app is missing. Install Xcode and open it once so simctl works." >&2
@@ -65,11 +70,33 @@ resolve_sim_udid() {
   printf '%s\n' "$udid"
 }
 
+# PATH first, then the Homebrew prefixes macOS shells often leave off PATH.
+# Returns 0 and sets TMUX_BIN when a binary is found.
+resolve_tmux_bin() {
+  local candidate
+  if command -v tmux >/dev/null 2>&1; then
+    TMUX_BIN="$(command -v tmux)"
+    return 0
+  fi
+  for candidate in /opt/homebrew/bin/tmux /usr/local/bin/tmux; do
+    if [[ -f "$candidate" && -x "$candidate" ]]; then
+      TMUX_BIN="$candidate"
+      return 0
+    fi
+  done
+  TMUX_BIN=""
+  return 1
+}
+
 tmux_cmd() {
+  if [[ -z "$TMUX_BIN" ]]; then
+    echo "tmux binary was not resolved." >&2
+    return 127
+  fi
   if [[ -f "$TMUX_CONF" ]]; then
-    tmux -f "$TMUX_CONF" "$@"
+    "$TMUX_BIN" -f "$TMUX_CONF" "$@"
   else
-    tmux "$@"
+    "$TMUX_BIN" "$@"
   fi
 }
 
@@ -144,11 +171,6 @@ main() {
     exit 1
   fi
 
-  if ! command -v tmux >/dev/null 2>&1; then
-    echo "tmux not found in PATH." >&2
-    exit 1
-  fi
-
   require_xcode_simulator
 
   if [[ ! -d "$PROJECT_DIR" ]]; then
@@ -172,18 +194,25 @@ main() {
   echo "==> flutter pub get"
   flutter pub get
 
-  if tmux_cmd has-session -t "=$TMUX_SESSION" 2>/dev/null; then
-    echo "==> Stopping prior Flutter run in tmux session $TMUX_SESSION"
-    tmux_cmd send-keys -t "$TMUX_SESSION:0.0" C-c
-    sleep 1
-    tmux_cmd kill-session -t "$TMUX_SESSION"
+  # Simulator.app is already open. A missing tmux must not unwind that boot.
+  if resolve_tmux_bin; then
+    if tmux_cmd has-session -t "=$TMUX_SESSION" 2>/dev/null; then
+      echo "==> Stopping prior Flutter run in tmux session $TMUX_SESSION"
+      tmux_cmd send-keys -t "$TMUX_SESSION:0.0" C-c
+      sleep 1
+      tmux_cmd kill-session -t "$TMUX_SESSION"
+    fi
+
+    echo "==> Starting flutter run -d ${udid} in tmux session $TMUX_SESSION"
+    tmux_cmd new-session -d -s "$TMUX_SESSION" -c "$PROJECT_DIR" -- \
+      "${SHELL:-bash}" -lc "flutter run -d \"${udid}\""
+
+    echo "Done. Attach with: tmux attach -t $TMUX_SESSION"
+  else
+    echo "tmux was not found so Flutter is starting in this terminal."
+    echo "==> flutter run -d ${udid}"
+    exec flutter run -d "$udid"
   fi
-
-  echo "==> Starting flutter run -d ${udid} in tmux session $TMUX_SESSION"
-  tmux_cmd new-session -d -s "$TMUX_SESSION" -c "$PROJECT_DIR" -- \
-    "${SHELL:-bash}" -lc "flutter run -d \"${udid}\""
-
-  echo "Done. Attach with: tmux attach -t $TMUX_SESSION"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
