@@ -32,7 +32,7 @@ class MyCardsScreen extends StatelessWidget {
             ),
             children: const [
               CapsuleHeader(),
-              SizedBox(height: VeraSpacing.s8),
+              SizedBox(height: VeraSpacing.s12),
               _CardCarousel(),
               SizedBox(height: VeraSpacing.s16),
               _UsageBar(),
@@ -53,123 +53,183 @@ class _CardCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 180,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: VeraSpacing.page),
-        itemCount: 2,
-        separatorBuilder: (context, index) =>
-            const SizedBox(width: VeraSpacing.s12),
-        itemBuilder: (context, index) => const _CapsuleCardFace(),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = (constraints.maxWidth - 72).clamp(280.0, 340.0);
+        return SizedBox(
+          height: 208,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            padding: const EdgeInsets.fromLTRB(20, 8, 0, 16),
+            itemCount: 2,
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemBuilder: (context, index) => _CapsuleCardFace(width: cardWidth),
+          ),
+        );
+      },
     );
   }
 }
 
 class _CapsuleCardFace extends StatelessWidget {
-  const _CapsuleCardFace();
+  const _CapsuleCardFace({required this.width});
+
+  final double width;
+
+  static const Color _black = Color(0xFF171717);
+  static const Color _band = Color(0xFF2E2E2E);
+  static const Color _manage = Color(0xFF434343);
+
+  /// Visa asset is white at 60% opacity. This grey tints it to the #747474
+  /// wordmark on the black card face.
+  static const Color _visa = Color(0xFFB2B2B2);
 
   @override
   Widget build(BuildContext context) {
     final colors = context.brand;
 
     return Container(
-      width: 320,
-      height: 180,
-      padding: const EdgeInsets.all(16),
+      width: width,
+      height: 184,
       decoration: BoxDecoration(
-        color: colors.cardSurface,
-        borderRadius: BorderRadius.circular(VeraRadii.card),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: colors.textPrimary.withValues(alpha: 0.2),
-            blurRadius: 32,
-            offset: const Offset(0, 4),
+            color: colors.headerPrimary.withValues(alpha: 0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              VeraSvg(
-                ThreeSixtyAssets.logomark,
-                width: 30,
-                height: 30,
-                color: colors.white,
-              ),
-              const Spacer(),
-              VeraSvg(
-                ThreeSixtyAssets.visaWordmark,
-                width: 64,
-                height: 20,
-                color: colors.white,
-              ),
-            ],
-          ),
-          const Spacer(),
-          Text(
-            MockDataCapsule.cardholderName,
-            style: TextStyle(
-              fontFamily: VeraTypography.geist,
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
-              color: colors.white,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                '•••• ${MockDataCapsule.cardLast4}',
-                style: TextStyle(
-                  fontFamily: VeraTypography.geistMono,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  letterSpacing: 1.2,
-                  color: colors.white.withValues(alpha: 0.85),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          children: [
+            Expanded(
+              child: ColoredBox(
+                color: _black,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 18, 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const VeraSvg(
+                        ThreeSixtyAssets.logomark,
+                        width: 32,
+                        height: 32,
+                      ),
+                      const Spacer(),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 4),
+                        child: VeraSvg(
+                          ThreeSixtyAssets.visaWordmark,
+                          width: 64,
+                          height: 20,
+                          color: _visa,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              VeraSvg(VeraAssets.eye, size: 18, color: colors.white),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: Haptics.wrap(() {
-                final brandController = BrandScope.read(context);
-                Navigator.of(context).push<void>(
-                  MaterialPageRoute<void>(
-                    builder: (_) => BrandScope(
-                      controller: brandController,
-                      child: const ManageCardScreen(),
+            ),
+            ColoredBox(
+              color: _band,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            MockDataCapsule.cardholderName,
+                            style: TextStyle(
+                              fontFamily: VeraTypography.geist,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              height: 22 / 16,
+                              color: colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Text(
+                                '••••',
+                                style: TextStyle(
+                                  fontFamily: VeraTypography.geist,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  letterSpacing: 0.6,
+                                  height: 1,
+                                  color: colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                MockDataCapsule.cardLast4,
+                                style: TextStyle(
+                                  fontFamily: VeraTypography.geist,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  height: 1,
+                                  color: colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              VeraSvg(
+                                ThreeSixtyAssets.iconEyeOpen,
+                                size: 16,
+                                color: colors.white,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(VeraRadii.card),
-                ),
-                child: Text(
-                  'Manage',
-                  style: TextStyle(
-                    fontFamily: VeraTypography.geist,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    color: colors.white,
-                  ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: Haptics.wrap(() {
+                        final brandController = BrandScope.read(context);
+                        Navigator.of(context).push<void>(
+                          MaterialPageRoute<void>(
+                            builder: (_) => BrandScope(
+                              controller: brandController,
+                              child: const ManageCardScreen(),
+                            ),
+                          ),
+                        );
+                      }),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 11,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _manage,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Manage',
+                          style: TextStyle(
+                            fontFamily: VeraTypography.geist,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            height: 20 / 15,
+                            color: colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -185,6 +245,8 @@ class _UsageBar extends StatelessWidget {
     final available = MockDataCapsule.amountAvailable;
     final total = used + available;
     final usedFraction = used / total;
+    final availableInk = Color.lerp(colors.success, colors.white, 0.38)!;
+    final hatch = Color.lerp(colors.success, colors.white, 0.78)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: VeraSpacing.page),
@@ -194,38 +256,57 @@ class _UsageBar extends StatelessWidget {
             children: [
               _UsageLegend(
                 color: colors.accent,
-                label: '\$${groupedInt(used.round())} used',
+                amount: '\$${groupedInt(used.round())}',
+                label: 'used',
               ),
               const Spacer(),
               _UsageLegend(
-                color: colors.success,
-                label: '\$${groupedInt(available.round())} available',
+                color: availableInk,
+                amount: '\$${groupedInt(available.round())}',
+                label: 'available',
               ),
             ],
           ),
-          const SizedBox(height: VeraSpacing.s8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(2),
-            child: SizedBox(
-              height: 8,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: (usedFraction * 1000).round().clamp(1, 999),
-                    child: ColoredBox(color: colors.accent),
-                  ),
-                  Expanded(
-                    flex: ((1 - usedFraction) * 1000).round().clamp(1, 999),
-                    child: CustomPaint(
-                      painter: _SuccessHatchPainter(
-                        base: colors.success,
-                        hatch: colors.white.withValues(alpha: 0.3),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const gap = 4.0;
+              const barHeight = 8.0;
+              final width = constraints.maxWidth;
+              final usedWidth = (width * usedFraction).clamp(40.0, width * 0.45);
+              final availableWidth = (width - usedWidth - gap).clamp(0.0, width);
+              return SizedBox(
+                height: barHeight,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: usedWidth,
+                      height: barHeight,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colors.accent,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                    const SizedBox(width: gap),
+                    SizedBox(
+                      width: availableWidth,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: CustomPaint(
+                          painter: _SuccessHatchPainter(
+                            base: availableInk,
+                            hatch: hatch,
+                          ),
+                          child: const SizedBox.expand(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -234,13 +315,34 @@ class _UsageBar extends StatelessWidget {
 }
 
 class _UsageLegend extends StatelessWidget {
-  const _UsageLegend({required this.color, required this.label});
+  const _UsageLegend({
+    required this.color,
+    required this.amount,
+    required this.label,
+  });
 
   final Color color;
+  final String amount;
   final String label;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.brand;
+    final amountStyle = TextStyle(
+      fontFamily: VeraTypography.geist,
+      fontWeight: FontWeight.w700,
+      fontSize: 13,
+      height: 18 / 13,
+      color: colors.headerPrimary,
+    );
+    final labelStyle = TextStyle(
+      fontFamily: VeraTypography.geist,
+      fontWeight: FontWeight.w500,
+      fontSize: 13,
+      height: 18 / 13,
+      color: colors.textSecondary,
+    );
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -250,7 +352,9 @@ class _UsageLegend extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(label, style: context.type.p2),
+        Text(amount, style: amountStyle),
+        const SizedBox(width: 4),
+        Text(label, style: labelStyle),
       ],
     );
   }
@@ -267,14 +371,12 @@ class _SuccessHatchPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, Paint()..color = base);
     final line = Paint()
       ..color = hatch
-      ..strokeWidth = 1;
-    const step = 6.0;
+      ..strokeWidth = 1.4
+      ..style = PaintingStyle.stroke;
+    const step = 7.0;
+    final run = size.height * 0.55;
     for (var x = -size.height; x < size.width + size.height; x += step) {
-      canvas.drawLine(
-        Offset(x, size.height),
-        Offset(x + size.height, 0),
-        line,
-      );
+      canvas.drawLine(Offset(x, 0), Offset(x - run, size.height), line);
     }
   }
 
@@ -477,12 +579,11 @@ class _CapsuleTxnRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(txn.merchant, style: context.type.h4),
-                    Row(
-                      children: [
-                        Text(txn.date, style: context.type.p2),
-                        Text(' • ', style: context.type.p2),
-                        Text(txn.time, style: context.type.p2),
-                      ],
+                    Text(
+                      '${txn.date} • ${txn.time}',
+                      style: context.type.p2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

@@ -4,6 +4,7 @@ import 'package:project360/app/app.dart';
 import 'package:project360/app/theme/brand.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/features/three_sixty/capsule_app.dart';
+import 'package:project360/features/three_sixty/capsule_shell.dart';
 
 void main() {
   testWidgets('360 section appears on index', (tester) async {
@@ -30,6 +31,13 @@ void main() {
 
     expect(find.text('Recent transactions'), findsOneWidget);
     expect(find.text('Pay now'), findsOneWidget);
+    expect(find.text('Vera'), findsOneWidget);
+    expect(find.byType(CapsuleBrandMark), findsOneWidget);
+    expect(find.text('Zack'), findsWidgets);
+    expect(find.text('\$100'), findsOneWidget);
+    expect(find.text('used'), findsOneWidget);
+    expect(find.text('\$4,900'), findsOneWidget);
+    expect(find.text('available'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('View statements'),
       200,
@@ -55,6 +63,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Credit Health'), findsWidgets);
+    expect(find.byType(CapsuleBrandMark), findsOneWidget);
+    expect(find.text('Vera'), findsOneWidget);
     expect(find.text('Perfect run'), findsOneWidget);
     expect(
       find.text('Your credit score has increased by 25 points'),

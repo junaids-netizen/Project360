@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:project360/app/theme/brand_theme.dart';
-import 'package:project360/app/theme/vera_metrics.dart';
 import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/widgets/three_sixty_assets.dart';
 import 'package:project360/core/widgets/vera_assets.dart' show VeraAssets, VeraSvg;
@@ -16,55 +15,114 @@ class CapsuleHeader extends StatelessWidget {
     final colors = context.brand;
     final brand = BrandScope.of(context).brand;
 
+    final frame = MediaQuery.sizeOf(context).width.clamp(0.0, 480.0);
+    final labelMax = (frame - 168).clamp(72.0, 240.0);
+
     return SizedBox(
       height: 56,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: VeraSpacing.page),
-        child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: Image.asset(
-                ThreeSixtyAssets.avatar,
-                width: 36,
-                height: 36,
-                fit: BoxFit.cover,
-              ),
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  VeraSvg(
-                    ThreeSixtyAssets.logomark,
-                    width: 28,
-                    height: 28,
-                    color: colors.accent,
+            Row(
+              children: [
+                ClipOval(
+                  child: Image.asset(
+                    ThreeSixtyAssets.avatar,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      brand.name,
-                      style: context.type.h3.copyWith(
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.36,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                ),
+                const Spacer(),
+                VeraSvg(
+                  VeraAssets.bell,
+                  size: 22,
+                  color: colors.headerPrimary,
+                ),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CapsuleBrandMark(color: colors.accent, size: 30),
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: labelMax),
+                  child: Text(
+                    brand.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: VeraTypography.geist,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      height: 26 / 20,
+                      letterSpacing: -0.4,
+                      color: colors.headerPrimary,
                     ),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: VeraSvg(VeraAssets.bell, size: 24, color: colors.textPrimary),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
+}
+
+/// Two overlapping circles. Both discs use [color] (the active accent); the
+/// lens where they cross is a darker shade of that same colour.
+class CapsuleBrandMark extends StatelessWidget {
+  const CapsuleBrandMark({super.key, required this.color, this.size = 30});
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _CapsuleBrandMarkPainter(color),
+    );
+  }
+}
+
+class _CapsuleBrandMarkPainter extends CustomPainter {
+  _CapsuleBrandMarkPainter(this.color);
+
+  final Color color;
+
+  // Centres from assets/images/360/logomark.svg (29.333 view box).
+  static const double _box = 29.3334;
+  static const double _radius = 10.4762;
+  static const double _front = 10.4762;
+  static const double _back = 18.8572;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final s = size.width;
+    final r = s * (_radius / _box);
+    final front = Offset(s * (_front / _box), s * (_front / _box));
+    final back = Offset(s * (_back / _box), s * (_back / _box));
+    final fill = Paint()..color = color;
+    canvas.drawCircle(front, r, fill);
+    canvas.drawCircle(back, r, fill);
+    final lens = Paint()
+      ..color = Color.lerp(color, const Color(0xFF000000), 0.5)!;
+    canvas.save();
+    canvas.clipPath(
+      Path()..addOval(Rect.fromCircle(center: front, radius: r)),
+    );
+    canvas.drawCircle(back, r, lens);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _CapsuleBrandMarkPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class CapsuleTabBar extends StatelessWidget {

@@ -31,4 +31,5 @@ abstract final class ThreeSixtyAssets {
   static const String paymentStripBg = '$_base/payment_strip_bg.png';
   static const String chevronRightSm = '$_base/chevron_right_sm.svg';
   static const String visaWordmark = '$_base/visa_wordmark.svg';
+  static const String iconEyeOpen = '$_base/icon_eye_open.svg';
 }
