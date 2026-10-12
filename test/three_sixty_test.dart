@@ -40,6 +40,32 @@ void main() {
     expect(find.text('Due amount'), findsOneWidget);
   });
 
+  testWidgets('Credit Health tab shows score gauge and chart copy', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BrandScope(
+          controller: BrandController(veraBrand),
+          child: const CapsuleApp(initialTab: 2),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Credit Health'), findsWidgets);
+    expect(find.text('Perfect run'), findsOneWidget);
+    expect(
+      find.text('Your credit score has increased by 25 points'),
+      findsOneWidget,
+    );
+    expect(find.text('784'), findsWidgets);
+    expect(find.text('300'), findsOneWidget);
+    expect(find.text('850'), findsOneWidget);
+    expect(find.text('1Y'), findsOneWidget);
+  });
+
   testWidgets('Family Hub tab shows member rail and balance', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));

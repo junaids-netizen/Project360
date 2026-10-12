@@ -15,6 +15,10 @@ abstract final class ThreeSixtyAssets {
   static const String transunionLogo = '$_base/transunion_logo.svg';
   static const String gaugeTrack = '$_base/gauge_track.svg';
   static const String gaugeArc = '$_base/gauge_arc.svg';
+  static const String gaugeProgress = '$_base/gauge_progress.svg';
+  static const String gaugeArrowUp = '$_base/gauge_arrow_up.svg';
+  static const String gaugeArrowDown = '$_base/gauge_arrow_down.svg';
+  static const String creditHealthBgTile = '$_base/credit_health_bg_tile.png';
 
   static const String avatarZack = '$_base/avatar_zack.png';
   static const String avatarRachel = '$_base/avatar_rachel.png';
