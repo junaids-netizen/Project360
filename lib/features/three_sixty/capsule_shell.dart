@@ -36,10 +36,22 @@ class CapsuleHeader extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                VeraSvg(
-                  VeraAssets.bell,
-                  size: 22,
-                  color: colors.headerPrimary,
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colors.border,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Center(
+                      child: VeraSvg(
+                        VeraAssets.bell,
+                        size: 20,
+                        color: colors.headerPrimary,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
