@@ -145,9 +145,13 @@ class _CapsuleCardFace extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: GestureDetector(
               onTap: Haptics.wrap(() {
+                final brandController = BrandScope.read(context);
                 Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(
-                    builder: (_) => const ManageCardScreen(),
+                    builder: (_) => BrandScope(
+                      controller: brandController,
+                      child: const ManageCardScreen(),
+                    ),
                   ),
                 );
               }),

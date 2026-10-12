@@ -40,6 +40,26 @@ void main() {
     expect(find.text('Due amount'), findsOneWidget);
   });
 
+  testWidgets('Family Hub tab shows member rail and balance', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BrandScope(
+          controller: BrandController(veraBrand),
+          child: const CapsuleApp(initialTab: 1),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Family Hub'), findsWidgets);
+    expect(find.text('Zack'), findsWidgets);
+    expect(find.text('Rachel'), findsOneWidget);
+    expect(find.text('Used'), findsOneWidget);
+    expect(find.text('Manage card'), findsOneWidget);
+    expect(find.text('PENDING'), findsOneWidget);
+    expect(find.text('DECLINED'), findsOneWidget);
+  });
+
   testWidgets('Manage opens manage card screen', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
