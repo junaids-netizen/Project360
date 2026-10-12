@@ -11,9 +11,11 @@
 # Defaults: branch cursor/fix-home-screen-884e, tmux session project360-iphone17,
 # simulator name "iPhone 17" (IOS_SIM_NAME).
 #
-# Boot path is Xcode only: `xcrun simctl` plus Simulator.app. This script does
-# not call `flutter emulators`, `flutter devices`, or Flutter Device Hub. Those
-# go through Flutter's device daemon, which tries to discover and boot the
+# Boot path is Xcode only: `xcrun simctl` plus Simulator.app opened by full
+# bundle path. `open -a Simulator` is not used; that name is often unregistered
+# because Simulator.app lives inside Xcode. This script does not call
+# `flutter emulators`, `flutter devices`, or Flutter Device Hub. Those go
+# through Flutter's device daemon, which tries to discover and boot the
 # simulator itself and can hang on sim loading.
 #
 # tmux is optional. When `tmux` is on PATH, or at /opt/homebrew/bin/tmux or
@@ -29,24 +31,28 @@ IOS_SIM_NAME="${IOS_SIM_NAME:-iPhone 17}"
 BOOT_TIMEOUT_SECS=60
 TMUX_CONF="${TMUX_CONF:-/exec-daemon/tmux.portal.conf}"
 TMUX_BIN=""
+SIMULATOR_APP=""
 
-xcode_setup_error() {
-  echo "Simulator.app is missing. Install Xcode and open it once so simctl works." >&2
+simctl_missing_error() {
+  echo "xcrun simctl was not found. Install Xcode and open it once so simctl works." >&2
   exit 1
 }
 
-# Exact device-name match against `xcrun simctl list devices available`.
-# "iPhone 17" must not select "iPhone 17 Pro". When several runtimes list the
-# same name, the last one wins (simctl prints newer runtimes later).
-resolve_sim_udid() {
+simulator_app_missing_error() {
+  echo "Simulator.app was not found. Open Xcode once and install the iOS Simulator runtime (Xcode → Settings → Platforms)." >&2
+  exit 1
+}
+
+# Exact device-name match against simctl text. The line must start with
+# "<name> (" so "iPhone 17" does not select "iPhone 17 Pro". When several
+# runtimes list the same name, the last one wins (simctl prints newer
+# runtimes later).
+udid_from_device_list() {
   local name="$1"
-  local list_output line trimmed prefix rest udid=""
+  local list_output="$2"
+  local line trimmed prefix rest udid="" any=0
   if [[ -z "$name" ]]; then
     echo "IOS_SIM_NAME is empty." >&2
-    return 1
-  fi
-  if ! list_output="$(xcrun simctl list devices available)"; then
-    echo "xcrun simctl list devices available failed. Install Xcode and open it once so simctl works." >&2
     return 1
   fi
   prefix="${name} ("
@@ -58,9 +64,20 @@ resolve_sim_udid() {
     fi
   done <<< "$list_output"
   if [[ -z "$udid" ]]; then
-    echo "No available simulator named \"${name}\"." >&2
-    echo "Install that simulator in Xcode, or set IOS_SIM_NAME to a name from:" >&2
-    echo "  xcrun simctl list devices available" >&2
+    echo "No available simulator named exactly \"${name}\"." >&2
+    echo "\"${name}\" is matched as a whole device name, so it does not select a longer name such as \"${name} Pro\"." >&2
+    echo "Available iPhone simulators:" >&2
+    while IFS= read -r line; do
+      trimmed="${line#"${line%%[![:space:]]*}"}"
+      if [[ "$trimmed" == iPhone\ * ]]; then
+        echo "  ${trimmed}" >&2
+        any=1
+      fi
+    done <<< "$list_output"
+    if [[ "$any" -eq 0 ]]; then
+      echo "  (none)" >&2
+    fi
+    echo "Install that simulator in Xcode → Settings → Platforms, or set IOS_SIM_NAME to one of the names above." >&2
     return 1
   fi
   if [[ ! "$udid" =~ ^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$ ]]; then
@@ -68,6 +85,41 @@ resolve_sim_udid() {
     return 1
   fi
   printf '%s\n' "$udid"
+}
+
+resolve_sim_udid() {
+  local name="$1"
+  local list_output
+  if ! list_output="$(xcrun simctl list devices available)"; then
+    echo "xcrun simctl list devices available failed. Install Xcode and open it once so simctl works." >&2
+    return 1
+  fi
+  udid_from_device_list "$name" "$list_output"
+}
+
+# Simulator.app is not registered as the bare name "Simulator". It ships
+# inside the active Xcode developer directory.
+resolve_simulator_app() {
+  local developer_dir="" candidate=""
+  developer_dir="$(xcode-select -p 2>/dev/null || true)"
+  if [[ -n "$developer_dir" && -d "${developer_dir}/Applications/Simulator.app" ]]; then
+    printf '%s\n' "${developer_dir}/Applications/Simulator.app"
+    return 0
+  fi
+  if [[ -d "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" ]]; then
+    printf '%s\n' "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
+    return 0
+  fi
+  if command -v mdfind >/dev/null 2>&1; then
+    # Read the first hit without a pipefail `head` pipeline (SIGPIPE).
+    while IFS= read -r candidate; do
+      if [[ -n "$candidate" && -d "$candidate" ]]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    done < <(mdfind 'kMDItemCFBundleIdentifier == com.apple.iphonesimulator' 2>/dev/null || true)
+  fi
+  return 1
 }
 
 # PATH first, then the Homebrew prefixes macOS shells often leave off PATH.
@@ -101,18 +153,13 @@ tmux_cmd() {
 }
 
 require_xcode_simulator() {
-  local developer_dir=""
   if ! command -v xcrun >/dev/null 2>&1 || ! xcrun --find simctl >/dev/null 2>&1; then
-    xcode_setup_error
+    simctl_missing_error
   fi
-  developer_dir="$(xcode-select -p 2>/dev/null || true)"
-  if [[ -n "$developer_dir" && -d "${developer_dir}/Applications/Simulator.app" ]]; then
-    return 0
+  SIMULATOR_APP="$(resolve_simulator_app)" || simulator_app_missing_error
+  if [[ ! -d "$SIMULATOR_APP" ]]; then
+    simulator_app_missing_error
   fi
-  if [[ -d "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" ]]; then
-    return 0
-  fi
-  xcode_setup_error
 }
 
 wait_until_booted() {
@@ -151,8 +198,11 @@ boot_with_xcode() {
   fi
   rm -f "$boot_log"
 
-  echo "==> open -a Simulator --args -CurrentDeviceUDID ${udid}"
-  open -a Simulator --args -CurrentDeviceUDID "$udid"
+  if [[ -z "$SIMULATOR_APP" || ! -d "$SIMULATOR_APP" ]]; then
+    simulator_app_missing_error
+  fi
+  echo "==> open -a \"${SIMULATOR_APP}\" --args -CurrentDeviceUDID ${udid}"
+  open -a "$SIMULATOR_APP" --args -CurrentDeviceUDID "$udid"
 
   echo "==> Waiting until ${udid} is Booted (timeout ${BOOT_TIMEOUT_SECS}s)"
   wait_until_booted "$udid"

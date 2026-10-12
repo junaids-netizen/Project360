@@ -11,11 +11,15 @@ chmod +x ~/Desktop/Cursor/Project360-360/scripts/relaunch_ios_sim.sh   # once
 
 The script boots the simulator from Xcode first, then Flutter only attaches to that device:
 
-1. `xcrun simctl list devices available` resolves the simulator name (default `iPhone 17`, override with `IOS_SIM_NAME`) to a UDID.
+1. `xcrun simctl list devices available` resolves the simulator name (default `iPhone 17`, override with `IOS_SIM_NAME`) to a UDID. The name must match exactly: `iPhone 17` does not select `iPhone 17 Pro`. If that device is missing, the script says so and lists the available iPhone simulators.
 2. `xcrun simctl boot <udid>` boots it. An already-booted device (`current state: Booted`) is left alone.
-3. `open -a Simulator --args -CurrentDeviceUDID <udid>` opens Xcode's Simulator.app (not Flutter's emulator launcher).
+3. Simulator.app is opened from the Xcode developer directory, not with `open -a Simulator` (that name lookup fails when the app is only registered inside Xcode). The script tries, in order:
+   - `$(xcode-select -p)/Applications/Simulator.app`
+   - `/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app`
+   - `mdfind 'kMDItemCFBundleIdentifier == com.apple.iphonesimulator'`
+   Then `open -a "<that .app path>" --args -CurrentDeviceUDID <udid>`. If none of those bundles exist, it stops before `flutter run` and tells you to open Xcode once and install the iOS Simulator runtime (Xcode → Settings → Platforms).
 4. The script waits until `xcrun simctl list devices` shows that UDID as `Booted` (about 60 seconds).
-5. `flutter pub get`, then `flutter run -d <udid>`.
+5. `flutter pub get`, then `flutter run -d <udid>` (the UDID, not the device name).
    - When `tmux` is on PATH, or at `/opt/homebrew/bin/tmux` or `/usr/local/bin/tmux`, the run stays in tmux session `project360-iphone17`.
    - When tmux is missing, the script has already booted Simulator from Xcode. It prints `tmux was not found so Flutter is starting in this terminal.` and runs `flutter run -d <udid>` in the current terminal. A missing tmux does not stop Simulator.app from opening.
 
@@ -27,7 +31,7 @@ It does not call `flutter emulators`, `flutter devices`, or Flutter Device Hub.
 
 This script does not ask the daemon to boot anything. Xcode's `simctl` and Simulator.app bring the device up first. Flutter is started only after that UDID is already `Booted`, and it is given the UDID so it attaches to the running simulator.
 
-If Simulator.app or `simctl` is missing, the script stops and tells you to install Xcode and open it once so simctl works.
+If `simctl` is missing, the script stops and tells you to install Xcode and open it once so simctl works. If Simulator.app is missing, it stops before `flutter run` and tells you to open Xcode once and install the iOS Simulator runtime (Xcode → Settings → Platforms).
 
 Defaults:
 
