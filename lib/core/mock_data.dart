@@ -19,7 +19,8 @@ class VeraTransaction {
 abstract final class MockData {
   static const String userName = 'Sandeep Sachdeva';
   static const String initials = 'SS';
-  static const String joined = 'Joined Jan 2026';
+  static const String joined = 'Joined Jan 2024';
+  static const int inboxCount = 2;
   static const String cardPan = '4522 • • • • • • • • 9031';
   static const String cardFirst4 = '4522';
   static const String cardLast4 = '9031';
@@ -39,6 +40,18 @@ abstract final class MockData {
 
   static const List<VeraTransaction> homeTransactions = [
     VeraTransaction(
+      title: 'Amazon',
+      date: 'Jul 5, 2025',
+      kind: TxnKind.purchase,
+      amount: 542.89,
+    ),
+    VeraTransaction(
+      title: 'Starbucks',
+      date: 'Jul 5, 2025',
+      kind: TxnKind.purchase,
+      amount: 542.89,
+    ),
+    VeraTransaction(
       title: 'Delta Airlines',
       date: 'Jul 5, 2025',
       kind: TxnKind.purchase,
@@ -51,55 +64,31 @@ abstract final class MockData {
       amount: 542.89,
     ),
     VeraTransaction(
-      title: 'Starbucks',
-      date: 'Jul 5, 2025',
-      kind: TxnKind.purchase,
-      amount: 542.89,
-    ),
-    VeraTransaction(
       title: 'Refund Amazon',
       date: 'Jul 5, 2025',
       kind: TxnKind.refund,
-      amount: 542.89,
-    ),
-    VeraTransaction(
-      title: 'Amazon',
-      date: 'Jul 5, 2025',
-      kind: TxnKind.purchase,
       amount: 542.89,
     ),
   ];
 
   static const List<VeraTransaction> rewardsStatement = [
     VeraTransaction(
-      title: 'Delta Airlines',
-      date: 'Jul 5, 2025',
+      title: 'Amazon',
+      date: 'Jul 5',
       kind: TxnKind.earn,
-      points: 43,
-    ),
-    VeraTransaction(
-      title: 'Redeemed',
-      date: 'Jul 5, 2025',
-      kind: TxnKind.redeem,
-      points: -1452,
+      points: 2,
     ),
     VeraTransaction(
       title: 'Starbucks',
-      date: 'Jul 5, 2025',
+      date: 'Jul 2',
       kind: TxnKind.earn,
       points: 7,
     ),
     VeraTransaction(
-      title: 'Refund Amazon',
-      date: 'Jul 5, 2025',
+      title: 'Delta Airlines',
+      date: 'Jun 29',
       kind: TxnKind.earn,
-      points: 5,
-    ),
-    VeraTransaction(
-      title: 'Amazon',
-      date: 'Jul 5, 2025',
-      kind: TxnKind.earn,
-      points: 2,
+      points: 43,
     ),
   ];
 }

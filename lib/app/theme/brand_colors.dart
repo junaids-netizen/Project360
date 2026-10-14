@@ -15,6 +15,9 @@ const Color _white = Color(0xFFFFFFFF);
 /// lightness of each derived shade come from Vera's Figma palette. That keeps
 /// the contrast relationships the design was drawn with, so a bank whose brand
 /// colour is pale yellow still gets a legible dark card and readable ink.
+///
+/// A website pitch may also pass a light [background], dark [textPrimary], and
+/// [accentSecondary] read from the page. Presets omit them.
 @immutable
 class BrandColors {
   const BrandColors._({
@@ -23,6 +26,7 @@ class BrandColors {
     required this.cardSurface,
     required this.navActive,
     required this.textPrimary,
+    this.background = const Color(0xFFFAFAFA),
     required this.surfaceMuted,
     required this.borderMuted,
     required this.letterbox,
@@ -38,7 +42,17 @@ class BrandColors {
   ///
   /// [saturationScale] dials every derived shade down for brands whose identity
   /// is muted — a navy or slate bank looks wrong rendered at Vera's intensity.
-  factory BrandColors.fromSeed(Color seed, {double saturationScale = 1.0}) {
+  ///
+  /// [background], [textPrimary], and [accentSecondary] are optional surfaces
+  /// from a bank website. Null keeps the neutral page, the derived ink, and
+  /// the derived secondary accent.
+  factory BrandColors.fromSeed(
+    Color seed, {
+    double saturationScale = 1.0,
+    Color? background,
+    Color? textPrimary,
+    Color? accentSecondary,
+  }) {
     final baseHue = HSLColor.fromColor(seed).hue;
 
     Color shade(double hueShift, double saturation, double lightness) {
@@ -52,10 +66,11 @@ class BrandColors {
 
     return BrandColors._(
       accent: seed,
-      accentSecondary: shade(-63.8692, 1.0000, 0.4196),
+      accentSecondary: accentSecondary ?? shade(-63.8692, 1.0000, 0.4196),
       cardSurface: shade(6.8060, 0.5630, 0.2333),
       navActive: shade(3.5556, 1.0000, 0.1588),
-      textPrimary: shade(0.0000, 1.0000, 0.1078),
+      textPrimary: textPrimary ?? shade(0.0000, 1.0000, 0.1078),
+      background: background ?? const Color(0xFFFAFAFA),
       surfaceMuted: shade(-12.0000, 0.0769, 0.9745),
       borderMuted: shade(-32.0000, 0.0667, 0.9118),
       letterbox: shade(3.0000, 0.1905, 0.9176),
@@ -97,6 +112,10 @@ class BrandColors {
 
   final Color textPrimary;
 
+  /// Page background. Neutral for every preset; a pitch can supply the light
+  /// background read from a bank site.
+  final Color background;
+
   /// Faint brand-tinted greys used by the payment callout.
   final Color surfaceMuted;
   final Color borderMuted;
@@ -137,7 +156,6 @@ class BrandColors {
   // because a green that follows the brand hue is no longer a success colour.
 
   final Color white = _white;
-  final Color background = const Color(0xFFFAFAFA);
   final Color border = const Color(0xFFF0F0F0);
   final Color headerPrimary = const Color(0xFF121212);
 
@@ -190,6 +208,8 @@ class BrandColors {
   final Color success = const Color(0xFF006328);
   final Color warning = const Color(0xFFE06C00);
   final Color danger = const Color(0xFFCC4B0E);
+  final Color info = const Color(0xFF3B82F6);
+  final Color paymentStripBorder = const Color(0xFFFFF4E8);
 
   /// Ink that stays legible on [surface]. Guards against banks whose brand
   /// colour is light enough that white text on it disappears.

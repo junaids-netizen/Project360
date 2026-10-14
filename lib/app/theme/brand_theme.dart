@@ -31,6 +31,12 @@ class BrandController extends ChangeNotifier {
 
   static const String _idKey = 'brand.id';
   static const String _seedKey = 'brand.seed';
+  static const String _nameKey = 'brand.name';
+  static const String _logoKey = 'brand.logo';
+  static const String _hostKey = 'brand.host';
+  static const String _backgroundKey = 'brand.background';
+  static const String _textKey = 'brand.text';
+  static const String _accentKey = 'brand.accent';
 
   BrandTheme _theme;
 
@@ -38,7 +44,7 @@ class BrandController extends ChangeNotifier {
   Brand get brand => _theme.brand;
 
   void select(Brand brand) {
-    if (brand.id == _theme.brand.id && brand.seed == _theme.brand.seed) return;
+    if (_theme.brand.sameAs(brand)) return;
     _theme = BrandTheme(brand);
     notifyListeners();
     unawaited(_persist(brand));
@@ -66,6 +72,19 @@ class BrandController extends ChangeNotifier {
         final seed = prefs.getInt(_seedKey);
         return seed == null ? veraBrand : Brand.custom(Color(seed));
       }
+      if (id == Brand.websiteId) {
+        final seed = prefs.getInt(_seedKey);
+        if (seed == null) return veraBrand;
+        return Brand.website(
+          name: prefs.getString(_nameKey) ?? 'Bank',
+          seed: Color(seed),
+          logoUrl: prefs.getString(_logoKey),
+          sourceHost: prefs.getString(_hostKey),
+          background: _readColor(prefs.getInt(_backgroundKey)),
+          text: _readColor(prefs.getInt(_textKey)),
+          accent: _readColor(prefs.getInt(_accentKey)),
+        );
+      }
       return brandPresets.firstWhere(
         (brand) => brand.id == id,
         orElse: () => veraBrand,
@@ -75,11 +94,46 @@ class BrandController extends ChangeNotifier {
     }
   }
 
+  static Color? _readColor(int? argb) => argb == null ? null : Color(argb);
+
+  static Future<void> _writeColor(
+    SharedPreferences prefs,
+    String key,
+    Color? color,
+  ) {
+    if (color == null) return prefs.remove(key);
+    return prefs.setInt(key, color.toARGB32());
+  }
+
+  static Future<void> _writeString(
+    SharedPreferences prefs,
+    String key,
+    String? value,
+  ) {
+    if (value == null || value.isEmpty) return prefs.remove(key);
+    return prefs.setString(key, value);
+  }
+
   static Future<void> _persist(Brand brand) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_idKey, brand.id);
       await prefs.setInt(_seedKey, brand.seed.toARGB32());
+      if (brand.id == Brand.websiteId) {
+        await _writeString(prefs, _nameKey, brand.name);
+        await _writeString(prefs, _logoKey, brand.logoUrl);
+        await _writeString(prefs, _hostKey, brand.sourceHost);
+        await _writeColor(prefs, _backgroundKey, brand.background);
+        await _writeColor(prefs, _textKey, brand.text);
+        await _writeColor(prefs, _accentKey, brand.accent);
+      } else {
+        await prefs.remove(_nameKey);
+        await prefs.remove(_logoKey);
+        await prefs.remove(_hostKey);
+        await prefs.remove(_backgroundKey);
+        await prefs.remove(_textKey);
+        await prefs.remove(_accentKey);
+      }
     } catch (_) {
       // A demo tool that cannot write preferences should still run.
     }

@@ -93,7 +93,8 @@ void main() {
     for (final brand in brandPresets) {
       final resolved = brand.resolve();
       final ink = resolved.onColor(resolved.accent);
-      final contrast = (ink.computeLuminance() + 0.05) /
+      final contrast =
+          (ink.computeLuminance() + 0.05) /
           (resolved.accent.computeLuminance() + 0.05);
       final ratio = contrast < 1 ? 1 / contrast : contrast;
       expect(
@@ -112,6 +113,24 @@ void main() {
       expect(resolved.success, colors.success);
       expect(resolved.danger, colors.danger);
     }
+  });
+
+  test('extracted surfaces override only the tokens they map to', () {
+    const seed = Color(0xFF117ACA);
+    final derived = BrandColors.fromSeed(seed);
+    final mapped = BrandColors.fromSeed(
+      seed,
+      background: const Color(0xFFF3F6F8),
+      textPrimary: const Color(0xFF102033),
+      accentSecondary: const Color(0xFFE2A100),
+    );
+    expect(mapped.accent.toARGB32(), seed.toARGB32());
+    expect(mapped.background.toARGB32(), 0xFFF3F6F8);
+    expect(mapped.textPrimary.toARGB32(), 0xFF102033);
+    expect(mapped.accentSecondary.toARGB32(), 0xFFE2A100);
+    expect(mapped.cardSurface.toARGB32(), derived.cardSurface.toARGB32());
+    expect(mapped.success.toARGB32(), derived.success.toARGB32());
+    expect(mapped.border.toARGB32(), derived.border.toARGB32());
   });
 
   test('a light brand seed still yields a dark, legible card', () {
