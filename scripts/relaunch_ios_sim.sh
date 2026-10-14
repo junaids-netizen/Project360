@@ -8,8 +8,12 @@
 #   PROJECT360_DIR=~/Desktop/Cursor/Project360-360 ./scripts/relaunch_ios_sim.sh
 #   IOS_SIM_NAME="iPhone 16" ./scripts/relaunch_ios_sim.sh
 #
-# Defaults: branch cursor/fix-home-screen-884e, tmux session project360-iphone17,
-# simulator name "iPhone 17" (IOS_SIM_NAME).
+# Defaults: branch cursor/fix-home-screen-884e, tmux session project360-ios-sim,
+# simulator name "iPhone 18 Pro" (IOS_SIM_NAME).
+#
+# Older copies of this script used tmux session project360-iphone17. This script
+# does not attach to or kill that session (it cannot see a session on your Mac).
+# Stop a leftover one yourself with: tmux kill-session -t project360-iphone17
 #
 # Boot path is Xcode only: `xcrun simctl` plus Simulator.app opened by full
 # bundle path. `open -a Simulator` is not used; that name is often unregistered
@@ -26,8 +30,8 @@ set -euo pipefail
 
 BRANCH="${1:-cursor/fix-home-screen-884e}"
 PROJECT_DIR="${PROJECT360_DIR:-${HOME}/Desktop/Cursor/Project360-360}"
-TMUX_SESSION="${PROJECT360_TMUX_SESSION:-project360-iphone17}"
-IOS_SIM_NAME="${IOS_SIM_NAME:-iPhone 17}"
+TMUX_SESSION="${PROJECT360_TMUX_SESSION:-project360-ios-sim}"
+IOS_SIM_NAME="${IOS_SIM_NAME:-iPhone 18 Pro}"
 BOOT_TIMEOUT_SECS=60
 TMUX_CONF="${TMUX_CONF:-/exec-daemon/tmux.portal.conf}"
 TMUX_BIN=""
@@ -44,8 +48,9 @@ simulator_app_missing_error() {
 }
 
 # Exact device-name match against simctl text. The line must start with
-# "<name> (" so "iPhone 17" does not select "iPhone 17 Pro". When several
-# runtimes list the same name, the last one wins (simctl prints newer
+# "<name> (" so a name that contains spaces still matches only that device:
+# "iPhone 18 Pro" does not select "iPhone 18" or "iPhone 18 Pro Max". When
+# several runtimes list the same name, the last one wins (simctl prints newer
 # runtimes later).
 udid_from_device_list() {
   local name="$1"
@@ -65,7 +70,7 @@ udid_from_device_list() {
   done <<< "$list_output"
   if [[ -z "$udid" ]]; then
     echo "No available simulator named exactly \"${name}\"." >&2
-    echo "\"${name}\" is matched as a whole device name, so it does not select a longer name such as \"${name} Pro\"." >&2
+    echo "\"${name}\" is matched as a whole device name, so it does not select a shorter or longer name." >&2
     echo "Available iPhone simulators:" >&2
     while IFS= read -r line; do
       trimmed="${line#"${line%%[![:space:]]*}"}"
