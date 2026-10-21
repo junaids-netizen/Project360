@@ -54,6 +54,13 @@ class CapsuleFamilyMember {
   final String avatarAsset;
 }
 
+class CreditInsight {
+  const CreditInsight({required this.title, required this.body});
+
+  final String title;
+  final String body;
+}
+
 abstract final class MockDataCapsule {
   static const String cardholderName = 'Zack';
   static const String cardLast4 = '4192';
@@ -75,6 +82,43 @@ abstract final class MockDataCapsule {
   static const String creditClaimHeadline = 'Claim them back';
   static const String creditClaimSubline =
       'Your credit score has decreased by 25 points. See the report to claim them back.';
+
+  /// Credit Health insights list (Figma node 46:6252).
+  static const List<CreditInsight> creditInsights = [
+    CreditInsight(
+      title: 'Don’t miss payments',
+      body:
+          'Paying on-time is generally the most important factor in achieving a high score.',
+    ),
+    CreditInsight(
+      title: 'Keep accounts open',
+      body:
+          'Even if you don’t use them, building a longer credit history is a good thing.',
+    ),
+    CreditInsight(
+      title: 'Optimize your balance',
+      body:
+          'A high balance is good for us, but bad for you. Try your best to not use your entire credit line.',
+    ),
+    CreditInsight(
+      title: 'Regularly monitor your score',
+      body:
+          'You will see what is working and be able to detect suspicious changes.',
+    ),
+    CreditInsight(
+      title: 'Build your credit file',
+      body:
+          'Show lenders that you responsibly make payments on multiple types of loans.',
+    ),
+  ];
+
+  static const String creditVantageDisclaimer =
+      'We provide your VantageScore for educational purposes only. PNC is not '
+      'responsible for calculating this score. If you believe there is an error '
+      'with your score or any of your credit report information, you should '
+      'contact TransUnion.\n\n'
+      'Please refer to your Credit Report Authorization for complete terms and '
+      'conditions.';
 
   static const double familyUsed = 3100;
   static const double familyAvailable = 4000;

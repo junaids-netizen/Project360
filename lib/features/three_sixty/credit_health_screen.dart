@@ -15,6 +15,7 @@ const Color _gaugeGlow = Color(0xFF7FDB69);
 const Color _chartGreen = Color(0xFF62A348);
 const Color _mutedInk = Color(0xFF8E8E8E);
 const Color _faintInk = Color(0xFFA3A3A3);
+const Color _insightBodyInk = Color(0xFF808080);
 const Color _gridLine = Color(0xFFF0F0F0);
 const Color _chartGrid = Color(0xFFE8E8E8);
 
@@ -119,12 +120,177 @@ class _CreditHealthScreenState extends State<CreditHealthScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: _ScoreChart(timeframeIndex: _timeframeIndex),
                     ),
+                    const SizedBox(height: VeraSpacing.s24),
+                    const _InsightsForYouSection(),
+                    const _CreditHealthDisclaimer(),
                   ],
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _InsightsForYouSection extends StatelessWidget {
+  const _InsightsForYouSection();
+
+  static const _rowTitleStyle = TextStyle(
+    fontFamily: VeraTypography.geist,
+    fontWeight: FontWeight.w500,
+    fontSize: 14,
+    height: 20 / 14,
+    color: Color(0xFF222222),
+  );
+
+  static const _rowBodyStyle = TextStyle(
+    fontFamily: VeraTypography.geist,
+    fontWeight: FontWeight.w500,
+    fontSize: 12,
+    height: 16 / 12,
+    color: _insightBodyInk,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.brand;
+    final insights = MockDataCapsule.creditInsights;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        GestureDetector(
+          onTap: () {},
+          behavior: HitTestBehavior.opaque,
+          child: SizedBox(
+            height: 48,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Insights for you',
+                      style: TextStyle(
+                        fontFamily: VeraTypography.geist,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        height: 24 / 16,
+                        color: colors.textPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: VeraSvg(VeraAssets.chevron, size: 24),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        for (var i = 0; i < insights.length; i++) ...[
+          _InsightRow(
+            insight: insights[i],
+            titleStyle: _rowTitleStyle,
+            bodyStyle: _rowBodyStyle,
+          ),
+          if (i < insights.length - 1)
+            Padding(
+              padding: const EdgeInsets.only(left: 56, right: VeraSpacing.s16),
+              child: Divider(height: 1, thickness: 1, color: colors.borderMuted),
+            ),
+        ],
+      ],
+    );
+  }
+}
+
+class _InsightRow extends StatelessWidget {
+  const _InsightRow({
+    required this.insight,
+    required this.titleStyle,
+    required this.bodyStyle,
+  });
+
+  final CreditInsight insight;
+  final TextStyle titleStyle;
+  final TextStyle bodyStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset(
+            ThreeSixtyAssets.insightIcon,
+            width: 56,
+            height: 56,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  insight.title,
+                  style: titleStyle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(insight.body, style: bodyStyle),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CreditHealthDisclaimer extends StatelessWidget {
+  const _CreditHealthDisclaimer();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.brand;
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            MockDataCapsule.creditVantageDisclaimer,
+            style: context.type.p2.copyWith(color: _insightBodyInk),
+          ),
+          const SizedBox(height: 19),
+          Text.rich(
+            TextSpan(
+              style: context.type.p2.copyWith(color: colors.textPrimary),
+              children: [
+                const TextSpan(
+                  text: 'Want to learn more about credit scores? ',
+                ),
+                TextSpan(
+                  text: 'Visit FAQs',
+                  style: context.type.p2.copyWith(
+                    color: colors.textPrimary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
