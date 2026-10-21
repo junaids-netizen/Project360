@@ -16,10 +16,6 @@ abstract final class ThreeSixtyAssets {
   static const String gaugeTrack = '$_base/gauge_track.svg';
   static const String gaugeArc = '$_base/gauge_arc.svg';
   static const String gaugeProgress = '$_base/gauge_progress.svg';
-  static const String gaugeCenter = '$_base/gauge_center.svg';
-  static const String gaugeTicksMain = '$_base/gauge_ticks_main.png';
-  static const String gaugeTicksBottomLeft = '$_base/gauge_ticks_bl.png';
-  static const String gaugeTicksBottomCenter = '$_base/gauge_ticks_bc.png';
   static const String gaugeArrowUp = '$_base/gauge_arrow_up.svg';
   static const String gaugeArrowDown = '$_base/gauge_arrow_down.svg';
   static const String creditHealthBgTile = '$_base/credit_health_bg_tile.png';

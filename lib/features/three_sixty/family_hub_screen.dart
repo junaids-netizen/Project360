@@ -24,7 +24,7 @@ class _FamilyHubScreenState extends State<FamilyHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.paddingOf(context).bottom + capsuleTabClearance;
+    const bottom = capsuleTabScrollGap;
 
     return SafeArea(
       bottom: false,

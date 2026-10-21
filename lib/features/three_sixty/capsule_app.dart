@@ -38,25 +38,16 @@ class _CapsuleAppState extends State<CapsuleApp> {
       ),
       child: Scaffold(
         backgroundColor: colors.background,
-        body: Stack(
-          children: [
-            IndexedStack(
-              index: _index,
-              children: const [
-                MyCardsScreen(),
-                FamilyHubScreen(),
-                CreditHealthScreen(),
-                CapsulePlaceholderScreen(title: 'Merlin'),
-              ],
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: CapsuleTabBar(index: _index, onSelected: _go),
-            ),
+        body: IndexedStack(
+          index: _index,
+          children: const [
+            MyCardsScreen(),
+            FamilyHubScreen(),
+            CreditHealthScreen(),
+            CapsulePlaceholderScreen(title: 'Merlin'),
           ],
         ),
+        bottomNavigationBar: CapsuleTabBar(index: _index, onSelected: _go),
       ),
     );
   }

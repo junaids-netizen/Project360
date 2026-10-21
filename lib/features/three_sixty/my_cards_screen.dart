@@ -10,6 +10,7 @@ import 'package:project360/core/widgets/vera_card.dart';
 import 'package:project360/core/widgets/vera_primitives.dart';
 import 'package:project360/features/home/bank_format.dart';
 import 'package:project360/features/three_sixty/capsule_shell.dart';
+import 'package:project360/features/home/repayment/repayment_flow.dart';
 import 'package:project360/features/three_sixty/manage_card_screen.dart';
 
 class MyCardsScreen extends StatelessWidget {
@@ -17,7 +18,7 @@ class MyCardsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.paddingOf(context).bottom + capsuleTabClearance;
+    const bottom = capsuleTabScrollGap;
 
     return SafeArea(
       bottom: false,
@@ -419,9 +420,7 @@ class _PaymentSection extends StatelessWidget {
             ),
             const SizedBox(width: VeraSpacing.s12),
             _PayNowButton(
-              onTap: () {
-                Haptics.light();
-              },
+              onTap: () => openRepaymentFlow(context),
               badgeLabel: MockDataCapsule.payBadgeLabel,
             ),
           ],

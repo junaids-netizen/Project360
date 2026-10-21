@@ -5,8 +5,17 @@ import 'package:project360/core/navigation/project_navigation.dart';
 import 'package:project360/core/widgets/three_sixty_assets.dart';
 import 'package:project360/core/widgets/vera_assets.dart' show VeraAssets, VeraSvg;
 
-/// Scroll padding above the fixed Capsule tab bar (bar + home-indicator gap).
-const double capsuleTabClearance = 98;
+/// Capsule tab row height (icons + labels), excluding the home-indicator inset.
+const double capsuleTabBarHeight = 64;
+
+/// Extra space below scroll content on capsule tabs (breathing room above the bar).
+const double capsuleTabScrollGap = 16;
+
+/// Bottom inset for lists when the tab bar is overlaid on the body (legacy layout).
+double capsuleTabClearance(BuildContext context) {
+  final home = MediaQuery.viewPaddingOf(context).bottom;
+  return capsuleTabBarHeight + (home > 0 ? home : 8);
+}
 
 class CapsuleHeader extends StatelessWidget {
   const CapsuleHeader({super.key});
@@ -163,18 +172,17 @@ class CapsuleTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.brand;
-    final bottom = MediaQuery.paddingOf(context).bottom;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        DecoratedBox(
+    return ColoredBox(
+      color: colors.white,
+      child: SafeArea(
+        top: false,
+        child: DecoratedBox(
           decoration: BoxDecoration(
-            color: colors.white,
             border: Border(top: BorderSide(color: colors.borderMuted)),
           ),
           child: SizedBox(
-            height: 64,
+            height: capsuleTabBarHeight,
             child: Row(
               children: [
                 for (var i = 0; i < _items.length; i++)
@@ -190,11 +198,7 @@ class CapsuleTabBar extends StatelessWidget {
             ),
           ),
         ),
-        ColoredBox(
-          color: colors.white,
-          child: SizedBox(height: bottom > 0 ? bottom : 8),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -249,12 +253,10 @@ class CapsulePlaceholderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.brand;
-    final bottom = MediaQuery.paddingOf(context).bottom + capsuleTabClearance;
-
     return SafeArea(
       bottom: false,
       child: ListView(
-        padding: EdgeInsets.only(bottom: bottom),
+        padding: const EdgeInsets.only(bottom: capsuleTabScrollGap),
         children: [
           const CapsuleHeader(),
           SizedBox(

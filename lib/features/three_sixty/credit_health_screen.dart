@@ -33,7 +33,7 @@ class _CreditHealthScreenState extends State<CreditHealthScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.brand;
-    final bottom = MediaQuery.paddingOf(context).bottom + capsuleTabClearance;
+    const bottom = capsuleTabScrollGap;
     final chartSeries =
         MockDataCapsule.chartSeriesForTimeframeIndex(_timeframeIndex);
     final delta = chartSeries.delta;
@@ -338,19 +338,31 @@ abstract final class _GaugeFigma {
   static const canvasH = 228.0;
 
   /// 300 mark (7 o'clock) through 850 (5 o'clock), clockwise over the top.
-  static const startAngle = 122 * math.pi / 180;
-  static const totalSweep = 293 * math.pi / 180;
+  static const startAngle = 124.5 * math.pi / 180;
+  static const totalSweep = 289.5 * math.pi / 180;
 
   /// Angular span of the exported progress wedge at score 784.
   static const referenceScore = 784;
-  static const progressWedgeSweep = 184 * math.pi / 180;
+  static const progressWedgeSweep = 181.7 * math.pi / 180;
 
   static const progressInset = 5.0;
   static const progressSize = 215.0;
-  static const progressHub = Offset(
-    progressInset + progressSize / 2,
-    progressInset + progressSize / 2,
-  );
+
+  /// Hub + score + arrows (nodes 46:6076–46:6086).
+  static const hubLeft = 52.0;
+  static const hubTop = 53.0;
+  static const hubSize = 120.0;
+  static const scoreLeft = 82.0;
+  // Figma places the text box at y=88 in Inter; Geist sits ~1.3pt higher in
+  // the same box, so it is nudged down to land the digits on Figma's.
+  static const scoreTop = 89.3;
+  static const scoreWidth = 61.0;
+  static const arrowWidth = 13.8564;
+  static const arrowHeight = 12.0;
+  static const arrowUpLeft = 96.07;
+  static const arrowUpTop = 132.0;
+  static const arrowDownLeft = 114.0;
+  static const arrowDownTop = 132.0;
 
   static double wedgeSweepRadians(int score) {
     final min = MockDataCapsule.creditScoreMin;
@@ -364,11 +376,6 @@ abstract final class _GaugeFigma {
     return progressWedgeSweep + (totalSweep - progressWedgeSweep) * t;
   }
 
-  static Offset progressTip(int score, {double radiusScale = 0.93}) {
-    final angle = startAngle + wedgeSweepRadians(score);
-    final r = (progressSize / 2) * radiusScale;
-    return progressHub + Offset(r * math.cos(angle), r * math.sin(angle));
-  }
 }
 
 class _ScoreGauge extends StatelessWidget {
@@ -384,15 +391,6 @@ class _ScoreGauge extends StatelessWidget {
   Widget build(BuildContext context) {
     final min = MockDataCapsule.creditScoreMin;
     final max = MockDataCapsule.creditScoreMax;
-    const glowW = 20.595;
-    const glowH = 26.676;
-    final glowLeft = score == _GaugeFigma.referenceScore
-        ? 162.356
-        : _GaugeFigma.progressTip(score).dx - glowW / 2;
-    final glowTop = score == _GaugeFigma.referenceScore
-        ? 39.554
-        : _GaugeFigma.progressTip(score).dy - glowH / 2;
-
     return Center(
       child: SizedBox(
         width: _GaugeFigma.canvasW,
@@ -407,7 +405,8 @@ class _ScoreGauge extends StatelessWidget {
               height: _GaugeFigma.canvasW,
               fit: BoxFit.fill,
             ),
-            // Layer: mint background arc (Ellipse 274)
+            // Layer: mint background arc (Ellipse 274). Its export is cropped
+            // to 225×205.558, so it must keep that height or it stretches.
             const Positioned(
               top: 0,
               left: 0,
@@ -418,146 +417,108 @@ class _ScoreGauge extends StatelessWidget {
                 fit: BoxFit.fill,
               ),
             ),
-            // Layer: gradient progress wedge (Ellipse 275), clipped to score
+            // Layer: gradient progress (Ellipse 275)
             Positioned(
-              left: _GaugeFigma.progressInset,
-              top: _GaugeFigma.progressInset,
-              width: _GaugeFigma.progressSize,
-              height: _GaugeFigma.progressSize,
-              child: ClipPath(
-                clipper: _GaugeWedgeClipper(
-                  center: _GaugeFigma.progressHub,
-                  startAngle: _GaugeFigma.startAngle,
-                  sweepAngle: _GaugeFigma.wedgeSweepRadians(score),
-                ),
-                child: const VeraSvg(
-                  ThreeSixtyAssets.gaugeProgress,
-                  width: _GaugeFigma.progressSize,
-                  height: _GaugeFigma.progressSize,
-                  fit: BoxFit.fill,
+              top: 0,
+              left: 0,
+              width: _GaugeFigma.canvasW,
+              height: _GaugeFigma.canvasW,
+              child: CustomPaint(
+                painter: _GaugeProgressPainter(
+                  sweepRadians: _GaugeFigma.wedgeSweepRadians(score),
                 ),
               ),
             ),
-            // Layer: tick marks (Ellipse 273 strokes @ 10%)
+            // Layer: tick marks (Ellipse 273)
             const Positioned(
-              left: 38,
-              top: 38,
-              width: 148,
-              height: 118,
-              child: Opacity(
-                opacity: 0.1,
-                child: Image(
-                  image: AssetImage(ThreeSixtyAssets.gaugeTicksMain),
-                  fit: BoxFit.fill,
-                ),
+              top: 0,
+              left: 0,
+              width: _GaugeFigma.canvasW,
+              height: _GaugeFigma.canvasW,
+              child: IgnorePointer(
+                child: CustomPaint(painter: _GaugeTicksPainter()),
               ),
             ),
-            const Positioned(
-              left: 88.26,
-              top: 161.27,
-              width: 68.311,
-              height: 26.734,
-              child: Opacity(
-                opacity: 0.1,
-                child: Image(
-                  image: AssetImage(ThreeSixtyAssets.gaugeTicksBottomLeft),
-                  fit: BoxFit.fill,
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 67.43,
-              top: 161.27,
-              width: 9.683,
-              height: 12.751,
-              child: Opacity(
-                opacity: 0.1,
-                child: Image(
-                  image: AssetImage(ThreeSixtyAssets.gaugeTicksBottomCenter),
-                  fit: BoxFit.fill,
-                ),
-              ),
-            ),
-            // Layer: center hub (Ellipse 272) — tap toggles claim report state
+            // Layer: needle (Rectangle 3)
             Positioned(
-              left: 52,
-              top: 53,
+              top: 0,
+              left: 0,
+              width: _GaugeFigma.canvasW,
+              height: _GaugeFigma.canvasW,
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _GaugeNeedlePainter(
+                    angle: _GaugeFigma.startAngle +
+                        _GaugeFigma.wedgeSweepRadians(score),
+                  ),
+                ),
+              ),
+            ),
+            // Layer: center hub (Ellipse 272, feDropShadow dy=4 blur=5 α=8%)
+            Positioned(
+              left: _GaugeFigma.hubLeft,
+              top: _GaugeFigma.hubTop,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: onCenterTap,
-                child: SizedBox(
-                  width: 120,
-                  height: 120,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          border: Border.all(color: const Color(0xFFE6E6E6)),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x14000000),
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        '$score',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontFamily: VeraTypography.geist,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 32,
-                          height: 38 / 32,
-                          color: _scoreInk,
-                        ),
-                      ),
-                      Transform.translate(
-                        offset: const Offset(0, 22),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const VeraSvg(
-                              ThreeSixtyAssets.gaugeArrowUp,
-                              width: 16,
-                              height: 16,
-                            ),
-                            const SizedBox(width: 2),
-                            Transform.rotate(
-                              angle: math.pi,
-                              child: const VeraSvg(
-                                ThreeSixtyAssets.gaugeArrowDown,
-                                width: 16,
-                                height: 16,
-                              ),
-                            ),
-                          ],
-                        ),
+                child: Container(
+                  width: _GaugeFigma.hubSize,
+                  height: _GaugeFigma.hubSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    border: Border.all(color: const Color(0xFFE6E6E6)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x14000000),
+                        // Flutter sigma = 0.577 × radius + 0.5; 7.8 → σ 5.
+                        blurRadius: 7.8,
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            // Layer: leading-edge glow (Rectangle 3) — above ticks, per Figma z-order
             Positioned(
-              left: glowLeft,
-              top: glowTop,
-              child: Container(
-                width: glowW,
-                height: glowH,
-                decoration: const BoxDecoration(
-                  color: _gaugeGlow,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
+              left: _GaugeFigma.scoreLeft,
+              top: _GaugeFigma.scoreTop,
+              width: _GaugeFigma.scoreWidth,
+              child: IgnorePointer(
+                child: Text(
+                  '$score',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: VeraTypography.geist,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 32,
+                    height: 38 / 32,
+                    color: _scoreInk,
+                  ),
+                ),
+              ),
+            ),
+            const Positioned(
+              left: _GaugeFigma.arrowUpLeft,
+              top: _GaugeFigma.arrowUpTop,
+              child: IgnorePointer(
+                child: VeraSvg(
+                  ThreeSixtyAssets.gaugeArrowUp,
+                  width: _GaugeFigma.arrowWidth,
+                  height: _GaugeFigma.arrowHeight,
+                ),
+              ),
+            ),
+            Positioned(
+              left: _GaugeFigma.arrowDownLeft,
+              top: _GaugeFigma.arrowDownTop,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: math.pi,
+                  child: const VeraSvg(
+                    ThreeSixtyAssets.gaugeArrowDown,
+                    width: _GaugeFigma.arrowWidth,
+                    height: _GaugeFigma.arrowHeight,
                   ),
                 ),
               ),
@@ -607,39 +568,112 @@ class _ScoreGauge extends StatelessWidget {
   }
 }
 
-class _GaugeWedgeClipper extends CustomClipper<Path> {
-  const _GaugeWedgeClipper({
-    required this.center,
-    required this.startAngle,
-    required this.sweepAngle,
-  });
+const Offset _gaugeHub = Offset(_GaugeFigma.canvasW / 2, _GaugeFigma.canvasW / 2);
 
-  final Offset center;
-  final double startAngle;
-  final double sweepAngle;
+/// Pie-slice progress (Ellipse 275) in the Figma 225×225 dial space; it sits
+/// 5pt inside the mint arc, so a sliver of mint shows beyond the fill.
+class _GaugeProgressPainter extends CustomPainter {
+  const _GaugeProgressPainter({required this.sweepRadians});
+
+  final double sweepRadians;
+
+  static const _hub = _gaugeHub;
+  static const _outerRadius = _GaugeFigma.progressSize / 2;
+
+  // gauge_progress.svg gradient runs (172,16) → (40,102.5) in its own
+  // coordinates, which share the origin and scale of the 215pt progress box.
+  static const _gradBox = _GaugeFigma.progressSize;
 
   @override
-  Path getClip(Size size) {
-    if (sweepAngle <= 0) {
-      return Path();
+  void paint(Canvas canvas, Size size) {
+    if (sweepRadians <= 0) {
+      return;
     }
-    final path = Path()
-      ..moveTo(center.dx, center.dy)
-      ..arcTo(
-        Rect.fromCircle(center: center, radius: size.longestSide),
-        startAngle,
-        sweepAngle,
-        false,
-      )
+
+    final arcRect = Rect.fromCircle(center: _hub, radius: _outerRadius);
+    final wedge = Path()
+      ..moveTo(_hub.dx, _hub.dy)
+      ..arcTo(arcRect, _GaugeFigma.startAngle, sweepRadians, false)
       ..close();
-    return path;
+
+    final gradRect = Rect.fromLTWH(
+      _GaugeFigma.progressInset,
+      _GaugeFigma.progressInset,
+      _GaugeFigma.progressSize,
+      _GaugeFigma.progressSize,
+    );
+    final fill = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment(
+          (172 / _gradBox) * 2 - 1,
+          (16 / _gradBox) * 2 - 1,
+        ),
+        end: Alignment(
+          (40 / _gradBox) * 2 - 1,
+          (102.5 / _gradBox) * 2 - 1,
+        ),
+        colors: const [Color(0xFF0C7C1E), Color(0xFF7FDB69)],
+      ).createShader(gradRect);
+
+    canvas.drawPath(wedge, fill);
   }
 
   @override
-  bool shouldReclip(covariant _GaugeWedgeClipper oldClipper) =>
-      oldClipper.startAngle != startAngle ||
-      oldClipper.sweepAngle != sweepAngle ||
-      oldClipper.center != center;
+  bool shouldRepaint(covariant _GaugeProgressPainter oldDelegate) =>
+      oldDelegate.sweepRadians != sweepRadians;
+}
+
+/// 15 radial ticks every 18°, from 144° round to 36° (0° points right),
+/// drawn over both the fill and the mint track. Inner ends run under the hub.
+class _GaugeTicksPainter extends CustomPainter {
+  const _GaugeTicksPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0x1F222222)
+      ..strokeWidth = 1;
+    for (var k = -7; k <= 7; k++) {
+      final a = (270 + 18 * k) * math.pi / 180;
+      final dir = Offset(math.cos(a), math.sin(a));
+      canvas.drawLine(_gaugeHub + dir * 55, _gaugeHub + dir * 73.5, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GaugeTicksPainter oldDelegate) => false;
+}
+
+/// Needle (Rectangle 3): a thin round-ended radial bar on the leading edge of
+/// the progress wedge, sitting mostly inside the fill. Its inner end runs
+/// under the hub, so only the outer ~28pt shows.
+class _GaugeNeedlePainter extends CustomPainter {
+  const _GaugeNeedlePainter({required this.angle});
+
+  final double angle;
+
+  static const _width = 3.2;
+  static const _innerRadius = 50.0;
+  static const _outerRadius = 86.4;
+  static const _insetFromEdge = 0.9;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final dir = Offset(math.cos(angle), math.sin(angle));
+    final back = Offset(math.sin(angle), -math.cos(angle)) * _insetFromEdge;
+    canvas.drawLine(
+      _gaugeHub + dir * _innerRadius + back,
+      _gaugeHub + dir * _outerRadius + back,
+      Paint()
+        ..color = _gaugeGlow
+        ..strokeWidth = _width
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GaugeNeedlePainter oldDelegate) =>
+      oldDelegate.angle != angle;
 }
 
 class _TimeframeSelector extends StatelessWidget {
