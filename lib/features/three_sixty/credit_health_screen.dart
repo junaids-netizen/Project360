@@ -41,39 +41,53 @@ class _CreditHealthScreenState extends State<CreditHealthScreen> {
         ? MockDataCapsule.creditClaimDialScore
         : chartSeries.latestScore;
 
+    const heroHeight = 56.0 + VeraSpacing.s8 + _GaugeFigma.canvasH;
+
     return ColoredBox(
       color: colors.white,
       child: SafeArea(
         bottom: false,
-        child: Stack(
-          children: [
-            const Positioned(
-              top: 56,
-              left: 0,
-              right: 0,
-              height: 280,
-              child: IgnorePointer(child: CustomPaint(painter: _GraphPaperPainter())),
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 480),
-                child: ListView(
-                  padding: EdgeInsets.only(bottom: bottom),
-                  physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics(),
-                  ),
-                  children: [
-                    const CapsuleHeader(),
-                    const SizedBox(height: VeraSpacing.s8),
-                    _ScoreGauge(
-                      score: gaugeScore,
-                      onCenterTap: () => setState(
-                        () => _dialClaimExpanded = !_dialClaimExpanded,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: heroHeight,
+                  width: double.infinity,
+                  child: Stack(
+                    clipBehavior: Clip.hardEdge,
+                    children: [
+                      const Positioned.fill(
+                        child: IgnorePointer(
+                          child: CustomPaint(painter: _GraphPaperPainter()),
+                        ),
                       ),
+                      Column(
+                        children: [
+                          const CapsuleHeader(),
+                          const SizedBox(height: VeraSpacing.s8),
+                          _ScoreGauge(
+                            score: gaugeScore,
+                            onCenterTap: () => setState(
+                              () => _dialClaimExpanded = !_dialClaimExpanded,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.only(bottom: bottom),
+                    physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics(),
                     ),
-                    const SizedBox(height: VeraSpacing.s12),
-                    Text(
+                    children: [
+                      const SizedBox(height: VeraSpacing.s12),
+                      Text(
                       _dialClaimExpanded
                           ? MockDataCapsule.creditClaimHeadline
                           : MockDataCapsule.creditHeadline,
@@ -121,13 +135,14 @@ class _CreditHealthScreenState extends State<CreditHealthScreen> {
                       child: _ScoreChart(timeframeIndex: _timeframeIndex),
                     ),
                     const SizedBox(height: VeraSpacing.s24),
-                    const _InsightsForYouSection(),
-                    const _CreditHealthDisclaimer(),
-                  ],
+                      const _InsightsForYouSection(),
+                      const _CreditHealthDisclaimer(),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -390,6 +405,7 @@ class _ScoreGauge extends StatelessWidget {
               ThreeSixtyAssets.gaugeTrack,
               width: _GaugeFigma.canvasW,
               height: _GaugeFigma.canvasW,
+              fit: BoxFit.fill,
             ),
             // Layer: mint background arc (Ellipse 274)
             const Positioned(
@@ -419,22 +435,6 @@ class _ScoreGauge extends StatelessWidget {
                   width: _GaugeFigma.progressSize,
                   height: _GaugeFigma.progressSize,
                   fit: BoxFit.fill,
-                ),
-              ),
-            ),
-            // Layer: leading-edge glow (Rectangle 3)
-            Positioned(
-              left: glowLeft,
-              top: glowTop,
-              child: Container(
-                width: glowW,
-                height: glowH,
-                decoration: const BoxDecoration(
-                  color: _gaugeGlow,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
                 ),
               ),
             ),
@@ -490,48 +490,74 @@ class _ScoreGauge extends StatelessWidget {
                   height: 120,
                   child: Stack(
                     clipBehavior: Clip.none,
+                    alignment: Alignment.center,
                     children: [
-                      const VeraSvg(
-                        ThreeSixtyAssets.gaugeCenter,
+                      Container(
                         width: 120,
                         height: 120,
-                        fit: BoxFit.contain,
-                      ),
-                      Positioned(
-                        left: 30,
-                        top: 35,
-                        width: 61,
-                        child: Text(
-                          '$score',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: VeraTypography.geist,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 32,
-                            height: 38 / 32,
-                            color: _scoreInk,
-                          ),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          border: Border.all(color: const Color(0xFFE6E6E6)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                       ),
-                      const Positioned(
-                        left: 43,
-                        top: 79,
-                        child: VeraSvg(
-                          ThreeSixtyAssets.gaugeArrowUp,
-                          width: 16,
-                          height: 16,
+                      Text(
+                        '$score',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: VeraTypography.geist,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 32,
+                          height: 38 / 32,
+                          color: _scoreInk,
                         ),
                       ),
-                      const Positioned(
-                        left: 61,
-                        top: 91,
-                        child: VeraSvg(
-                          ThreeSixtyAssets.gaugeArrowDown,
-                          width: 16,
-                          height: 16,
+                      Transform.translate(
+                        offset: const Offset(0, 22),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const VeraSvg(
+                              ThreeSixtyAssets.gaugeArrowUp,
+                              width: 16,
+                              height: 16,
+                            ),
+                            const SizedBox(width: 2),
+                            Transform.rotate(
+                              angle: math.pi,
+                              child: const VeraSvg(
+                                ThreeSixtyAssets.gaugeArrowDown,
+                                width: 16,
+                                height: 16,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+            ),
+            // Layer: leading-edge glow (Rectangle 3) — above ticks, per Figma z-order
+            Positioned(
+              left: glowLeft,
+              top: glowTop,
+              child: Container(
+                width: glowW,
+                height: glowH,
+                decoration: const BoxDecoration(
+                  color: _gaugeGlow,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
                 ),
               ),
