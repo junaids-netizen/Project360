@@ -5,6 +5,12 @@ import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
 import 'package:project360/core/mock_data.dart';
 import 'package:project360/core/widgets/vera_assets.dart';
+import 'package:project360/features/pitch/brand_mark.dart';
+
+bool _hasSiteLogo(BuildContext context) {
+  final url = BrandScope.of(context).brand.logoUrl;
+  return url != null && url.isNotEmpty;
+}
 
 class VeraCardFace extends StatefulWidget {
   const VeraCardFace({
@@ -13,16 +19,32 @@ class VeraCardFace extends StatefulWidget {
     this.revealed = true,
     this.showBrand = true,
     this.showCvv = false,
+    this.showSettings = true,
+    this.banner,
     this.frozen = false,
+    this.logo,
+    this.onLogoTap,
     this.onSettings,
+    this.onBanner,
   });
 
   final double height;
   final bool revealed;
   final bool showBrand;
   final bool showCvv;
+  final bool showSettings;
+  final String? banner;
   final bool frozen;
+
+  /// Replaces the wordmark. The pitch preview passes the logo read from a
+  /// bank site; null keeps [BrandMark], which uses the site logo when the
+  /// active brand has one and the Vera wordmark otherwise.
+  final Widget? logo;
+
+  /// Home card logo returns to the Project360 index when set.
+  final VoidCallback? onLogoTap;
   final VoidCallback? onSettings;
+  final VoidCallback? onBanner;
 
   @override
   State<VeraCardFace> createState() => _VeraCardFaceState();
@@ -161,7 +183,12 @@ class _VeraCardFaceState extends State<VeraCardFace>
                     onToggleSecrets: _toggleSecrets,
                     showBrand: widget.showBrand,
                     showCvv: widget.showCvv,
+                    showSettings: widget.showSettings,
+                    banner: widget.banner,
+                    logo: widget.logo,
+                    onLogoTap: widget.onLogoTap,
                     onSettings: widget.onSettings,
+                    onBanner: widget.onBanner,
                     panStyle: panStyle,
                   ),
                 ),
@@ -221,7 +248,12 @@ class _CardDetails extends StatelessWidget {
     required this.onToggleSecrets,
     required this.showBrand,
     required this.showCvv,
+    required this.showSettings,
+    required this.banner,
+    required this.logo,
+    required this.onLogoTap,
     required this.onSettings,
+    required this.onBanner,
     required this.panStyle,
   });
 
@@ -230,7 +262,12 @@ class _CardDetails extends StatelessWidget {
   final VoidCallback onToggleSecrets;
   final bool showBrand;
   final bool showCvv;
+  final bool showSettings;
+  final String? banner;
+  final Widget? logo;
+  final VoidCallback? onLogoTap;
   final VoidCallback? onSettings;
+  final VoidCallback? onBanner;
   final TextStyle panStyle;
 
   @override
@@ -242,35 +279,76 @@ class _CardDetails extends StatelessWidget {
         children: [
           Row(
             children: [
-              const VeraSvg(VeraAssets.logo, width: 44, height: 16),
-              if (showBrand) ...[
-                const SizedBox(width: 11),
-                Container(
-                  width: 1,
-                  height: 29,
-                  color: context.brand.cardDivider,
+              if (banner != null)
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onBanner,
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            banner!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: VeraTypography.geist,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              height: 22 / 16,
+                              letterSpacing: -0.32,
+                              color: context.brand.onColor(
+                                context.brand.cardSurface,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        VeraSvg(
+                          VeraAssets.chevron,
+                          size: 20,
+                          color: context.brand.onColor(
+                            context.brand.cardSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else ...[
+                _LogoTapTarget(
+                  onTap: onLogoTap,
+                  child: logo ??
+                      BrandMark(
+                        width: 44,
+                        height: _hasSiteLogo(context) ? 22 : 16,
+                        fallback: VeraAssets.logo,
+                      ),
                 ),
-                const SizedBox(width: 11),
-                const VeraSvg(
-                  VeraAssets.mastercard,
-                  width: 32,
-                  height: 26,
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: onSettings,
-                  child: const VeraSvg(VeraAssets.settings, size: 16),
-                ),
-                const SizedBox(width: 16),
-              ] else
-                const Spacer(),
+                if (showBrand) ...[
+                  const SizedBox(width: 11),
+                  Container(
+                    width: 1,
+                    height: 29,
+                    color: context.brand.cardDivider,
+                  ),
+                  const SizedBox(width: 11),
+                  const VeraSvg(VeraAssets.mastercard, width: 32, height: 26),
+                  const Spacer(),
+                  if (showSettings) ...[
+                    GestureDetector(
+                      onTap: onSettings,
+                      child: const VeraSvg(VeraAssets.settings, size: 16),
+                    ),
+                    const SizedBox(width: 16),
+                  ],
+                ] else
+                  const Spacer(),
+              ],
               GestureDetector(
                 onTap: onToggleSecrets,
                 behavior: HitTestBehavior.opaque,
-                child: Opacity(
-                  opacity: secretsRevealed ? 1 : 0.6,
-                  child: const VeraSvg(VeraAssets.eye, size: 16),
-                ),
+                child: const VeraSvg(VeraAssets.eye, size: 16),
               ),
             ],
           ),
@@ -448,7 +526,7 @@ class VeraBalanceBar extends StatelessWidget {
                 child: FittedBox(
                   alignment: Alignment.centerLeft,
                   fit: BoxFit.scaleDown,
-                  child: _SplitAmount(
+                  child: VeraSplitAmount(
                     whole: '4,500',
                     cents: '.88',
                     large: true,
@@ -459,7 +537,7 @@ class VeraBalanceBar extends StatelessWidget {
               FittedBox(
                 alignment: Alignment.centerRight,
                 fit: BoxFit.scaleDown,
-                child: _SplitAmount(
+                child: VeraSplitAmount(
                   whole: '15,550',
                   cents: '.88',
                   large: false,
@@ -517,16 +595,19 @@ class VeraBalanceBar extends StatelessWidget {
   }
 }
 
-class _SplitAmount extends StatelessWidget {
-  const _SplitAmount({
+class VeraSplitAmount extends StatelessWidget {
+  const VeraSplitAmount({
+    super.key,
     required this.whole,
     required this.cents,
     required this.large,
+    this.showCents = true,
   });
 
   final String whole;
   final String cents;
   final bool large;
+  final bool showCents;
 
   @override
   Widget build(BuildContext context) {
@@ -573,9 +654,7 @@ class _SplitAmount extends StatelessWidget {
       amount = shade(amount);
       dollarMark = Opacity(
         opacity: 0.5,
-        child: shade(
-          Text('\$', style: dollar.copyWith(color: colors.white)),
-        ),
+        child: shade(Text('\$', style: dollar.copyWith(color: colors.white))),
       );
     }
 
@@ -586,11 +665,30 @@ class _SplitAmount extends StatelessWidget {
         dollarMark,
         const SizedBox(width: 2),
         amount,
-        Padding(
-          padding: EdgeInsets.only(bottom: large ? 4 : 2),
-          child: Text(cents, style: centsStyle),
-        ),
+        if (showCents)
+          Padding(
+            padding: EdgeInsets.only(bottom: large ? 4 : 2),
+            child: Text(cents, style: centsStyle),
+          ),
       ],
+    );
+  }
+}
+
+class _LogoTapTarget extends StatelessWidget {
+  const _LogoTapTarget({required this.child, this.onTap});
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (onTap == null) return child;
+    return GestureDetector(
+      key: const Key('home_card_logo'),
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: child,
     );
   }
 }

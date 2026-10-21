@@ -24,7 +24,9 @@ abstract final class VeraAssets {
   static const String rewardsEarned = 'assets/images/rewards_earned.svg';
   static const String rewardsRedeemed = 'assets/images/rewards_redeemed.svg';
   static const String diamond = 'assets/images/diamond.svg';
+  static const String tabHome = 'assets/images/tab_home.svg';
   static const String tabRewards = 'assets/images/tab_rewards.svg';
+  static const String tabCard = 'assets/images/tab_card.svg';
   static const String tabAccount = 'assets/images/tab_account.svg';
   static const String back = 'assets/images/icon_back.svg';
   static const String info = 'assets/images/icon_info.svg';
@@ -54,6 +56,7 @@ class VeraSvg extends StatelessWidget {
     this.width,
     this.height,
     this.color,
+    this.fit = BoxFit.contain,
   });
 
   final String asset;
@@ -61,6 +64,7 @@ class VeraSvg extends StatelessWidget {
   final double? width;
   final double? height;
   final Color? color;
+  final BoxFit fit;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +77,7 @@ class VeraSvg extends StatelessWidget {
         asset,
         width: w,
         height: h,
-        fit: BoxFit.contain,
+        fit: fit,
         colorFilter: color == null
             ? null
             : ColorFilter.mode(color!, BlendMode.srcIn),

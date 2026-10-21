@@ -39,6 +39,64 @@ void main() {
     expect((await BrandController.restore()).id, veraBrand.id);
   });
 
+  test('a website brand keeps its logo and surfaces', () async {
+    SharedPreferences.setMockInitialValues({});
+    final brand = Brand.website(
+      name: 'Northwind',
+      seed: const Color(0xFF0B5FFF),
+      logoUrl: 'https://bank.example/touch-180.png',
+      background: const Color(0xFFF4F6F8),
+      text: const Color(0xFF102033),
+      accent: const Color(0xFFE2A100),
+      sourceHost: 'bank.example',
+    );
+    BrandController().select(brand);
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+
+    final restored = await BrandController.restore();
+    expect(restored.sameAs(brand), isTrue);
+  });
+
+  test('a new logo on the same website brand notifies', () {
+    SharedPreferences.setMockInitialValues({});
+    var notifications = 0;
+    final controller = BrandController()..addListener(() => notifications++);
+    final first = Brand.website(
+      name: 'Northwind',
+      seed: const Color(0xFF0B5FFF),
+      logoUrl: 'https://bank.example/a.png',
+    );
+    final second = Brand.website(
+      name: 'Northwind',
+      seed: const Color(0xFF0B5FFF),
+      logoUrl: 'https://bank.example/b.png',
+    );
+
+    controller.select(first);
+    controller.select(first);
+    expect(notifications, 1);
+    controller.select(second);
+    expect(notifications, 2);
+    expect(controller.brand.logoUrl, 'https://bank.example/b.png');
+  });
+
+  test('a muted website seed lowers saturation and a vivid one does not', () {
+    expect(
+      Brand.website(
+        name: 'Navy',
+        seed: const Color(0xFF1B3A4B),
+      ).saturationScale,
+      0.82,
+    );
+    expect(
+      Brand.website(
+        name: 'Blue',
+        seed: const Color(0xFF117ACA),
+      ).saturationScale,
+      1,
+    );
+  });
+
   test('selecting notifies listeners once', () {
     var notifications = 0;
     final controller = BrandController()..addListener(() => notifications++);
