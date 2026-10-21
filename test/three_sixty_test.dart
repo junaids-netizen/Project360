@@ -66,10 +66,8 @@ void main() {
     expect(find.byType(CapsuleBrandMark), findsOneWidget);
     expect(find.text('Vera'), findsOneWidget);
     expect(find.text('Perfect run'), findsOneWidget);
-    expect(
-      find.text('Your credit score has increased by 25 points'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('Your credit score has increased'), findsOneWidget);
+    expect(find.textContaining('points over 1y'), findsOneWidget);
     expect(find.text('784'), findsWidgets);
     expect(find.text('300'), findsOneWidget);
     expect(find.text('850'), findsOneWidget);
@@ -119,5 +117,30 @@ void main() {
     expect(find.text('Change PIN'), findsOneWidget);
     expect(find.text('Manage digital wallets'), findsOneWidget);
     expect(find.text('View account details'), findsOneWidget);
+  });
+
+  testWidgets('Capsule header brand returns to index', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      Project360App(controller: BrandController()),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Capsule app'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Capsule app'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('capsule_header_brand')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Project360'), findsOneWidget);
+    expect(find.text('Capsule app'), findsOneWidget);
   });
 }

@@ -161,10 +161,7 @@ require_xcode_simulator() {
   if ! command -v xcrun >/dev/null 2>&1 || ! xcrun --find simctl >/dev/null 2>&1; then
     simctl_missing_error
   fi
-  SIMULATOR_APP="$(resolve_simulator_app)" || simulator_app_missing_error
-  if [[ ! -d "$SIMULATOR_APP" ]]; then
-    simulator_app_missing_error
-  fi
+  SIMULATOR_APP="$(resolve_simulator_app)" || SIMULATOR_APP=""
 }
 
 wait_until_booted() {
@@ -203,11 +200,13 @@ boot_with_xcode() {
   fi
   rm -f "$boot_log"
 
-  if [[ -z "$SIMULATOR_APP" || ! -d "$SIMULATOR_APP" ]]; then
-    simulator_app_missing_error
+  if [[ -n "$SIMULATOR_APP" && -d "$SIMULATOR_APP" ]]; then
+    echo "==> open -a \"${SIMULATOR_APP}\" --args -CurrentDeviceUDID ${udid}"
+    open -a "$SIMULATOR_APP" --args -CurrentDeviceUDID "$udid"
+  else
+    echo "==> Simulator.app bundle not found (common on newer Xcode builds). simctl boot only."
+    echo "    If no simulator window appears, open Xcode → Window → Devices and Simulators."
   fi
-  echo "==> open -a \"${SIMULATOR_APP}\" --args -CurrentDeviceUDID ${udid}"
-  open -a "$SIMULATOR_APP" --args -CurrentDeviceUDID "$udid"
 
   echo "==> Waiting until ${udid} is Booted (timeout ${BOOT_TIMEOUT_SECS}s)"
   wait_until_booted "$udid"

@@ -4,6 +4,7 @@ import 'package:project360/app/theme/vera_metrics.dart';
 import 'package:project360/app/theme/vera_typography.dart';
 import 'package:project360/core/haptics.dart';
 import 'package:project360/core/mock_data.dart';
+import 'package:project360/core/navigation/project_navigation.dart';
 import 'package:project360/core/widgets/vera_assets.dart';
 import 'package:project360/core/widgets/vera_card.dart';
 import 'package:project360/core/widgets/vera_primitives.dart';
@@ -137,18 +138,19 @@ class _CardAndBalance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Stack(
+    return Stack(
       children: [
         Padding(
-          padding: EdgeInsets.only(bottom: 92),
+          padding: const EdgeInsets.only(bottom: 92),
           child: VeraCardFace(
             height: 156,
             revealed: false,
             showCvv: true,
             showSettings: false,
+            onLogoTap: () => popToProjectIndex(context),
           ),
         ),
-        Positioned(
+        const Positioned(
           left: 12,
           right: 12,
           bottom: 0,

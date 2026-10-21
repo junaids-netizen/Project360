@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project360/app/theme/brand_theme.dart';
 import 'package:project360/app/theme/vera_typography.dart';
+import 'package:project360/core/navigation/project_navigation.dart';
 import 'package:project360/core/widgets/three_sixty_assets.dart';
 import 'package:project360/core/widgets/vera_assets.dart' show VeraAssets, VeraSvg;
 
@@ -55,28 +56,33 @@ class CapsuleHeader extends StatelessWidget {
                 ),
               ],
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CapsuleBrandMark(color: colors.accent, size: 30),
-                const SizedBox(width: 8),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: labelMax),
-                  child: Text(
-                    brand.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: VeraTypography.geist,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
-                      height: 26 / 20,
-                      letterSpacing: -0.4,
-                      color: colors.headerPrimary,
+            GestureDetector(
+              key: const Key('capsule_header_brand'),
+              behavior: HitTestBehavior.opaque,
+              onTap: () => popToProjectIndex(context),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CapsuleBrandMark(color: colors.accent, size: 30),
+                  const SizedBox(width: 8),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: labelMax),
+                    child: Text(
+                      brand.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: VeraTypography.geist,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        height: 26 / 20,
+                        letterSpacing: -0.4,
+                        color: colors.headerPrimary,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

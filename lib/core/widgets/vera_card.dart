@@ -23,6 +23,7 @@ class VeraCardFace extends StatefulWidget {
     this.banner,
     this.frozen = false,
     this.logo,
+    this.onLogoTap,
     this.onSettings,
     this.onBanner,
   });
@@ -39,6 +40,9 @@ class VeraCardFace extends StatefulWidget {
   /// bank site; null keeps [BrandMark], which uses the site logo when the
   /// active brand has one and the Vera wordmark otherwise.
   final Widget? logo;
+
+  /// Home card logo returns to the Project360 index when set.
+  final VoidCallback? onLogoTap;
   final VoidCallback? onSettings;
   final VoidCallback? onBanner;
 
@@ -182,6 +186,7 @@ class _VeraCardFaceState extends State<VeraCardFace>
                     showSettings: widget.showSettings,
                     banner: widget.banner,
                     logo: widget.logo,
+                    onLogoTap: widget.onLogoTap,
                     onSettings: widget.onSettings,
                     onBanner: widget.onBanner,
                     panStyle: panStyle,
@@ -246,6 +251,7 @@ class _CardDetails extends StatelessWidget {
     required this.showSettings,
     required this.banner,
     required this.logo,
+    required this.onLogoTap,
     required this.onSettings,
     required this.onBanner,
     required this.panStyle,
@@ -259,6 +265,7 @@ class _CardDetails extends StatelessWidget {
   final bool showSettings;
   final String? banner;
   final Widget? logo;
+  final VoidCallback? onLogoTap;
   final VoidCallback? onSettings;
   final VoidCallback? onBanner;
   final TextStyle panStyle;
@@ -309,12 +316,15 @@ class _CardDetails extends StatelessWidget {
                   ),
                 )
               else ...[
-                logo ??
-                    BrandMark(
-                      width: 44,
-                      height: _hasSiteLogo(context) ? 22 : 16,
-                      fallback: VeraAssets.logo,
-                    ),
+                _LogoTapTarget(
+                  onTap: onLogoTap,
+                  child: logo ??
+                      BrandMark(
+                        width: 44,
+                        height: _hasSiteLogo(context) ? 22 : 16,
+                        fallback: VeraAssets.logo,
+                      ),
+                ),
                 if (showBrand) ...[
                   const SizedBox(width: 11),
                   Container(
@@ -661,6 +671,24 @@ class VeraSplitAmount extends StatelessWidget {
             child: Text(cents, style: centsStyle),
           ),
       ],
+    );
+  }
+}
+
+class _LogoTapTarget extends StatelessWidget {
+  const _LogoTapTarget({required this.child, this.onTap});
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (onTap == null) return child;
+    return GestureDetector(
+      key: const Key('home_card_logo'),
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: child,
     );
   }
 }

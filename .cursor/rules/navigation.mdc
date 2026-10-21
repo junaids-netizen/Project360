@@ -1,0 +1,13 @@
+---
+description: Project360 launcher navigation — logo on home returns to index
+globs: lib/**/*.dart
+alwaysApply: false
+---
+
+# Logo → index
+
+On **home** experiences (Vera home card logo, Capsule header brand lockup), tapping the **logo / brand mark** must always return the user to the Project360 **index** launcher screen.
+
+Use `popToProjectIndex` from `lib/core/navigation/project_navigation.dart` (pops the root navigator until the first route). Do not push a duplicate index or use Device Hub.
+
+Wire new home headers the same way: `onLogoTap` on `VeraCardFace`, or `GestureDetector` on the centered brand row in shell headers.

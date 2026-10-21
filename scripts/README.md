@@ -17,7 +17,7 @@ The script boots the simulator from Xcode first, then Flutter only attaches to t
    - `$(xcode-select -p)/Applications/Simulator.app`
    - `/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app`
    - `mdfind 'kMDItemCFBundleIdentifier == com.apple.iphonesimulator'`
-   Then `open -a "<that .app path>" --args -CurrentDeviceUDID <udid>`. If none of those bundles exist, it stops before `flutter run` and tells you to open Xcode once and install the iOS Simulator runtime (Xcode → Settings → Platforms).
+   Then `open -a "<that .app path>" --args -CurrentDeviceUDID <udid>`. If none of those bundles exist (some Xcode versions no longer ship a standalone Simulator.app), the script still boots with `simctl` and continues to `flutter run`. Open **Xcode → Window → Devices and Simulators** if you need the simulator window.
 4. The script waits until `xcrun simctl list devices` shows that UDID as `Booted` (about 60 seconds).
 5. `flutter pub get`, then `flutter run -d <udid>` (the UDID, not the device name).
    - When `tmux` is on PATH, or at `/opt/homebrew/bin/tmux` or `/usr/local/bin/tmux`, the run stays in tmux session `project360-ios-sim`. Older copies of this script used `project360-iphone17`; this script does not kill that session. Stop a leftover one with `tmux kill-session -t project360-iphone17`.
@@ -31,7 +31,7 @@ It does not call `flutter emulators`, `flutter devices`, or Flutter Device Hub.
 
 This script does not ask the daemon to boot anything. Xcode's `simctl` and Simulator.app bring the device up first. Flutter is started only after that UDID is already `Booted`, and it is given the UDID so it attaches to the running simulator.
 
-If `simctl` is missing, the script stops and tells you to install Xcode and open it once so simctl works. If Simulator.app is missing, it stops before `flutter run` and tells you to open Xcode once and install the iOS Simulator runtime (Xcode → Settings → Platforms).
+If `simctl` is missing, the script stops and tells you to install Xcode and open it once so simctl works. If Simulator.app is missing, boot still runs via `simctl`; use Devices and Simulators in Xcode to show the window.
 
 Defaults:
 

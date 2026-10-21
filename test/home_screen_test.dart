@@ -90,5 +90,10 @@ void main() {
     expect(find.text('Pay now'), findsOneWidget);
     expect(find.text('Current Balance'), findsOneWidget);
     expect(find.text('Back'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('home_card_logo')));
+    await tester.pumpAndSettle();
+    expect(find.text('Project360'), findsOneWidget);
+    expect(find.text('Vera app'), findsOneWidget);
   });
 }

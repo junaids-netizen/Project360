@@ -56,6 +56,7 @@ class VeraSvg extends StatelessWidget {
     this.width,
     this.height,
     this.color,
+    this.fit = BoxFit.contain,
   });
 
   final String asset;
@@ -63,6 +64,7 @@ class VeraSvg extends StatelessWidget {
   final double? width;
   final double? height;
   final Color? color;
+  final BoxFit fit;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +77,7 @@ class VeraSvg extends StatelessWidget {
         asset,
         width: w,
         height: h,
-        fit: BoxFit.contain,
+        fit: fit,
         colorFilter: color == null
             ? null
             : ColorFilter.mode(color!, BlendMode.srcIn),
